@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Weather</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Weather</h1>
+
+    <form id="search">
+      <input name="city" placeholder="Search for a city" aria-label="City" autocomplete="off" required>
+      <button>Search</button>
+    </form>
+
+    <p id="status" role="status"></p>
+
+    <section id="current" hidden>
+      <h2 id="place"></h2>
+      <div class="now">
+        <span id="icon" class="icon" aria-hidden="true"></span>
+        <span id="temp" class="temp"></span>
+      </div>
+      <p id="desc"></p>
+      <dl>
+        <dt>Feels like</dt><dd id="feels"></dd>
+        <dt>Humidity</dt><dd id="humidity"></dd>
+        <dt>Wind</dt><dd id="wind"></dd>
+      </dl>
+    </section>
+  </main>
+</body>
+</html>
