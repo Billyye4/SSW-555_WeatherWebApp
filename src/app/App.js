@@ -11,6 +11,7 @@ export class App {
   #alerts;
   #notifier;
   #airQuality;
+  #theme;
 
   #unit = 'F';
   #location = null;
@@ -20,7 +21,7 @@ export class App {
   #pollen; // PollenReport, null where there's no data, or undefined while it loads
   #loadId = 0;
 
-  constructor({ views, statusEl, geocoding, weather, prefs, favorites, alerts, notifier, airQuality }) {
+  constructor({ views, statusEl, geocoding, weather, prefs, favorites, alerts, notifier, airQuality, theme }) {
     this.#views = views;
     this.#statusEl = statusEl;
     this.#geocoding = geocoding;
@@ -30,6 +31,7 @@ export class App {
     this.#alerts = alerts;
     this.#notifier = notifier;
     this.#airQuality = airQuality;
+    this.#theme = theme;
   }
 
   init() {
@@ -129,6 +131,7 @@ export class App {
       daylightMinutes: report.daylightRemainingMinutes(),
     });
     this.#views.pollen.render(this.#pollen);
+    this.#theme.apply(report.current);
   }
 
   #renderFavorites() {
