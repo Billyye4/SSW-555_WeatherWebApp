@@ -28,4 +28,17 @@ export class WeatherReport {
   today() {
     return this.current.time.slice(0, 10);
   }
+
+  // US-09: the dates a user can ask about, today through the last forecast day.
+  forecastRange() {
+    const last = this.daily.at(-1);
+    return { min: this.today(), max: last ? last.date : this.today() };
+  }
+
+  // US-09: highest chance of precipitation (0–100) on a date, or null outside the forecast range.
+  rainChanceOn(date) {
+    const { min, max } = this.forecastRange();
+    if (date < min || date > max) return null;
+    return this.daily.find((d) => d.date === date)?.precipChanceMax ?? null;
+  }
 }

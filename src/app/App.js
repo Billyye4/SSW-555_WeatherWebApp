@@ -52,8 +52,9 @@ export class App {
 
   #render() {
     if (!this.#report) return;
-    const { current } = this.#report;
-    this.#views.current.render({ location: this.#location, current }, this.#unit);
+    const report = this.#report;
+    this.#views.current.render({ location: this.#location, current: report.current }, this.#unit);
+    this.#views.rainChance.render(report);
   }
 
   #setStatus(message) {
