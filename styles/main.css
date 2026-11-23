@@ -151,3 +151,17 @@ summary { cursor: pointer; color: #2563eb; }
 .alert-moderate .alert-badge { background: #eda100; color: #1b2430; }
 
 [hidden] { display: none !important; }
+
+/* US-11 pollen */
+.pollen-summary { margin: 0.75rem 0 0; }
+
+.pollen-badge {
+  display: inline-block;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.pollen-badge[data-level='low'] { background: #dcfce7; color: #166534; }
+.pollen-badge[data-level='moderate'] { background: #fef3c7; color: #92400e; }
+.pollen-badge[data-level='high'] { background: #fee2e2; color: #991b1b; }
