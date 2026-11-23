@@ -4,6 +4,7 @@ const form = document.querySelector('#search');
 const status = document.querySelector('#status');
 const current = document.querySelector('#current');
 const forecast = document.querySelector('#forecast');
+const forecastDays = forecast.querySelector('.forecast');
 const $ = (id) => document.getElementById(id);
 
 form.addEventListener('submit', async (e) => {
@@ -13,7 +14,7 @@ form.addEventListener('submit', async (e) => {
 
   status.textContent = 'Loading…';
   current.hidden = true;
-  forecast.replaceChildren();
+  forecastDays.replaceChildren();
   forecast.hidden = true;
   try {
     const place = await geocode(city);
@@ -40,7 +41,7 @@ function render(place, w, daily) {
   $('wind').textContent = `${w.wind_speed_10m} ${u.wind_speed_10m}`;
   current.hidden = false;
 
-  forecast.replaceChildren();
+  forecastDays.replaceChildren();
   daily.days.forEach((day) => {
     const [dayDescription, dayIcon] = describe(day.weather_code);
     const card = document.createElement('article');
@@ -68,7 +69,7 @@ function render(place, w, daily) {
     temperatures.textContent = `${Math.round(day.temperature_2m_max)}${daily.units.temperature_2m_max} / ${Math.round(day.temperature_2m_min)}${daily.units.temperature_2m_min}`;
 
     card.append(date, icon, description, temperatures);
-    forecast.append(card);
+    forecastDays.append(card);
   });
   forecast.hidden = false;
 }
