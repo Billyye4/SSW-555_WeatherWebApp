@@ -5,6 +5,7 @@ SSW 555 Scrum group project: a weather forecast web app.
 - Plain HTML, CSS, and JavaScript modules. No framework, no build step.
 - Weather data from [Open-Meteo](https://open-meteo.com/). It's free and needs no API key.
 - Backlog and sprint plan are in [docs/BACKLOG.md](docs/BACKLOG.md).
+- Classes, folder layout, and coding conventions are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Run locally
 
@@ -26,6 +27,8 @@ Tests use Node's built-in test runner. Put new tests next to the code, named `*.
 
 ## Project layout
 
+This is the current scaffold. The target layout (`src/` with one class per file) and how each file migrates into it are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#3-directory-structure).
+
 | File | Purpose |
 |------|---------|
 | `index.html` | Page markup |
@@ -37,8 +40,8 @@ Tests use Node's built-in test runner. Put new tests next to the code, named `*.
 ## Team workflow
 
 1. Pick a story from the sprint backlog and move it to **In Progress** on the project board.
-2. Branch from `main`: `git checkout -b US-04-forecast`.
-3. Commit, push, and open a pull request that names the story (for example, "US-04: 7-day forecast").
+2. Branch from `main`: `git checkout -b US-03-weekly-forecast`.
+3. Commit, push, and open a pull request that names the story (for example, "US-03: weekly forecast").
 4. Another team member reviews it. Merge after tests pass.
 
 ## Deploy
