@@ -18,8 +18,17 @@
 
     <p id="status" role="status"></p>
 
+    <section id="favorites" aria-labelledby="favorites-title">
+      <h2 id="favorites-title" class="section-title">Favorites</h2>
+      <ul data-field="list" class="favorite-list"></ul>
+      <p data-field="empty" class="hint">Press ☆ on a city to save it here.</p>
+    </section>
+
     <section id="current-weather" class="card" hidden>
-      <h2 data-field="place"></h2>
+      <div class="card-header">
+        <h2 data-field="place"></h2>
+        <button type="button" data-field="favorite" class="favorite-toggle" aria-pressed="false">☆</button>
+      </div>
       <div class="now">
         <span data-field="icon" class="icon" aria-hidden="true"></span>
         <span data-field="temp" class="temp"></span>

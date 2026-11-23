@@ -5,10 +5,12 @@ import { GeocodingService } from './services/GeocodingService.js';
 import { WeatherService } from './services/WeatherService.js';
 import { LocalStore } from './storage/LocalStore.js';
 import { PreferencesStore } from './storage/PreferencesStore.js';
+import { FavoritesStore } from './storage/FavoritesStore.js';
 import { SearchBar } from './ui/SearchBar.js';
 import { CurrentWeatherView } from './ui/CurrentWeatherView.js';
 import { RainChanceView } from './ui/RainChanceView.js';
 import { HistoryView } from './ui/HistoryView.js';
+import { FavoritesView } from './ui/FavoritesView.js';
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -19,9 +21,13 @@ const store = new LocalStore();
 let app;
 const views = {
   search: new SearchBar($('#search'), { onSearch: (name) => app.search(name) }),
-  current: new CurrentWeatherView($('#current-weather')),
+  current: new CurrentWeatherView($('#current-weather'), { onToggleFavorite: () => app.toggleFavorite() }),
   rainChance: new RainChanceView($('#rain-chance')),
   history: new HistoryView($('#history')),
+  favorites: new FavoritesView($('#favorites'), {
+    onSelect: (location) => app.loadLocation(location),
+    onRemove: (id) => app.removeFavorite(id),
+  }),
 };
 
 app = new App({
@@ -30,5 +36,6 @@ app = new App({
   geocoding: new GeocodingService(http),
   weather: new WeatherService(http),
   prefs: new PreferencesStore(store),
+  favorites: new FavoritesStore(store),
 });
 app.init();
