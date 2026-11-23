@@ -29,3 +29,9 @@ test('getReport makes one request and returns a WeatherReport', async () => {
   assert.equal(report.location, place);
   assert.equal(report.current.temperatureC, 10);
 });
+
+test('reportUrl asks for daily sunrise and sunset (US-12)', () => {
+  const daily = new URL(WeatherService.reportUrl(place)).searchParams.get('daily').split(',');
+  assert.ok(daily.includes('sunrise'));
+  assert.ok(daily.includes('sunset'));
+});

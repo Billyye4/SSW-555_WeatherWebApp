@@ -66,4 +66,24 @@ export class WeatherReport {
     if (avgHighThisWeekC == null || avgHighLastWeekC == null) return null;
     return { avgHighThisWeekC, avgHighLastWeekC, differenceC: avgHighThisWeekC - avgHighLastWeekC };
   }
+
+  // US-12: { sunrise, sunset } as local 'YYYY-MM-DDTHH:mm' strings, or null if the report has no times for that date.
+  sunTimesOn(date = this.today()) {
+    const day = this.daily.find((d) => d.date === date);
+    if (!day?.sunrise || !day?.sunset) return null;
+    return { sunrise: day.sunrise, sunset: day.sunset };
+  }
+
+  // US-12: daylight still ahead today. Before sunrise that's the whole day, and after sunset it's 0.
+  daylightRemainingMinutes() {
+    const sun = this.sunTimesOn();
+    if (!sun) return 0;
+    const from = this.current.time > sun.sunrise ? this.current.time : sun.sunrise;
+    return Math.max(0, minutesBetween(from, sun.sunset));
+  }
+}
+
+// Both times are local to the location, so read them as UTC to subtract them without any time zone shift.
+function minutesBetween(from, to) {
+  return Math.round((Date.parse(`${to}Z`) - Date.parse(`${from}Z`)) / 60_000);
 }

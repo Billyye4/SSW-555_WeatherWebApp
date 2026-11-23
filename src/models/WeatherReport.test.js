@@ -74,3 +74,39 @@ test('trendVsLastWeek skips missing values and returns null without history (US-
   assert.equal(gaps.trendVsLastWeek().differenceC, 0);
   assert.equal(report({ pastDays: 0 }).trendVsLastWeek(), null);
 });
+
+// US-12. The fixture puts sunrise at 06:50 and sunset at 16:30 every day.
+const at = (time) => report({ current: { time: `2026-11-23T${time}` } });
+
+test('sunTimesOn() defaults to today', () => {
+  assert.deepEqual(at('14:00').sunTimesOn(), { sunrise: '2026-11-23T06:50', sunset: '2026-11-23T16:30' });
+});
+
+test('sunTimesOn(date) returns another day in the report', () => {
+  assert.deepEqual(at('14:00').sunTimesOn('2026-11-24'), { sunrise: '2026-11-24T06:50', sunset: '2026-11-24T16:30' });
+});
+
+test('sunTimesOn(date) is null for a date outside the report', () => {
+  assert.equal(at('14:00').sunTimesOn('2026-12-09'), null);
+  assert.equal(at('14:00').sunTimesOn('2026-11-15'), null);
+});
+
+test('sunTimesOn(date) is null when the day has no sun times', () => {
+  const r = WeatherReport.fromApi(place, { ...forecastJson(), daily: { time: ['2026-11-23'] } });
+  assert.equal(r.sunTimesOn(), null);
+  assert.equal(r.daylightRemainingMinutes(), 0);
+});
+
+test('daylightRemainingMinutes counts from now to sunset during the day', () => {
+  assert.equal(at('14:00').daylightRemainingMinutes(), 150);
+  assert.equal(at('15:45').daylightRemainingMinutes(), 45);
+});
+
+test('daylightRemainingMinutes is the whole day before sunrise', () => {
+  assert.equal(at('05:00').daylightRemainingMinutes(), 580);
+});
+
+test('daylightRemainingMinutes is 0 at and after sunset', () => {
+  assert.equal(at('16:30').daylightRemainingMinutes(), 0);
+  assert.equal(at('23:45').daylightRemainingMinutes(), 0);
+});
