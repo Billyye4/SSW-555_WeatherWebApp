@@ -1,11 +1,22 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { describe, geocode } from './weather.js';
+import { describe, formatTemperature, formatWindSpeed, geocode } from './weather.js';
 
 test('describe maps known and unknown weather codes', () => {
   assert.deepEqual(describe(0), ['Clear sky', '☀️']);
   assert.equal(describe(63)[0], 'Rain');
   assert.equal(describe(999)[0], 'Unknown');
+});
+
+test('formats metric temperatures in Celsius and Fahrenheit', () => {
+  assert.equal(formatTemperature(20, 'C'), '20°C');
+  assert.equal(formatTemperature(20, 'F'), '68°F');
+  assert.equal(formatTemperature(-40, 'F'), '-40°F');
+});
+
+test('formats wind speed to match the selected temperature unit', () => {
+  assert.equal(formatWindSpeed(16.09344, 'C'), '16 km/h');
+  assert.equal(formatWindSpeed(16.09344, 'F'), '10 mph');
 });
 
 test('geocode returns the first match', async (t) => {

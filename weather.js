@@ -59,3 +59,15 @@ export async function getCurrent(lat, lon) {
   const data = await getJSON(url);
   return { ...data.current, units: data.current_units };
 }
+
+export function formatTemperature(celsius, unit) {
+  if (unit === 'C') return `${Math.round(celsius)}°C`;
+  if (unit === 'F') return `${Math.round((celsius * 9) / 5 + 32)}°F`;
+  throw new Error(`Unsupported temperature unit: ${unit}`);
+}
+
+export function formatWindSpeed(kmh, unit) {
+  if (unit === 'C') return `${Math.round(kmh)} km/h`;
+  if (unit === 'F') return `${Math.round(kmh / 1.609344)} mph`;
+  throw new Error(`Unsupported temperature unit: ${unit}`);
+}
