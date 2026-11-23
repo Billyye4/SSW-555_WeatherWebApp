@@ -23,4 +23,20 @@ export class Units {
       ? `${Math.round(Units.kmhToMph(kmh))} mph`
       : `${Math.round(kmh)} km/h`;
   }
+
+  // 16-point compass name for the direction the wind comes from (0° = N, 90° = E).
+  static degreesToCompass(deg) {
+    return COMPASS[Math.round((((deg % 360) + 360) % 360) / 22.5) % 16];
+  }
+
+  // '12 mph NNW'. Leaves the direction off when it's unknown.
+  static formatWind(kmh, deg, unit) {
+    const speed = Units.formatSpeed(kmh, unit);
+    return deg == null ? speed : `${speed} ${Units.degreesToCompass(deg)}`;
+  }
 }
+
+const COMPASS = [
+  'N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE',
+  'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW',
+];

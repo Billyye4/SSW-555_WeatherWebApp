@@ -21,6 +21,22 @@ test('formatTemp never shows -0', () => {
   assert.equal(Units.formatTemp(-0.3, 'C'), '0°C');
 });
 
+test('degreesToCompass names all 16 points and wraps around', () => {
+  assert.equal(Units.degreesToCompass(0), 'N');
+  assert.equal(Units.degreesToCompass(22.5), 'NNE');
+  assert.equal(Units.degreesToCompass(90), 'E');
+  assert.equal(Units.degreesToCompass(331), 'NNW');
+  assert.equal(Units.degreesToCompass(350), 'N');
+  assert.equal(Units.degreesToCompass(360), 'N');
+  assert.equal(Units.degreesToCompass(-90), 'W');
+});
+
+test('formatWind adds the compass direction', () => {
+  assert.equal(Units.formatWind(18.8, 331, 'F'), '12 mph NNW');
+  assert.equal(Units.formatWind(18.8, 180, 'C'), '19 km/h S');
+  assert.equal(Units.formatWind(18.8, null, 'C'), '19 km/h');
+});
+
 test('formatSpeed uses km/h for C and mph for F', () => {
   assert.equal(Units.formatSpeed(18.8, 'C'), '19 km/h');
   assert.equal(Units.formatSpeed(18.8, 'F'), '12 mph');

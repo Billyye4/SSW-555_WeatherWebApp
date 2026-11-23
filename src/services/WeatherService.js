@@ -5,7 +5,7 @@ const BASE_URL = 'https://api.open-meteo.com/v1/forecast';
 // Fields requested in the single forecast call. Add a field here when a story needs it.
 export const CURRENT_FIELDS = [
   'temperature_2m', 'apparent_temperature', 'relative_humidity_2m',
-  'wind_speed_10m', 'weather_code', 'is_day',
+  'wind_speed_10m', 'wind_direction_10m', 'weather_code', 'is_day',
 ];
 export const HOURLY_FIELDS = ['temperature_2m', 'precipitation_probability', 'weather_code'];
 export const DAILY_FIELDS = [
