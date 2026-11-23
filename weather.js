@@ -59,3 +59,19 @@ export async function getCurrent(lat, lon) {
   const data = await getJSON(url);
   return { ...data.current, units: data.current_units };
 }
+
+export async function getForecast(lat, lon) {
+  const url = 'https://api.open-meteo.com/v1/forecast?timezone=auto&forecast_days=7'
+    + `&latitude=${lat}&longitude=${lon}`
+    + '&daily=weather_code,temperature_2m_max,temperature_2m_min';
+  const data = await getJSON(url);
+  return {
+    days: data.daily.time.map((date, index) => ({
+      date,
+      weather_code: data.daily.weather_code[index],
+      temperature_2m_max: data.daily.temperature_2m_max[index],
+      temperature_2m_min: data.daily.temperature_2m_min[index],
+    })),
+    units: data.daily_units,
+  };
+}

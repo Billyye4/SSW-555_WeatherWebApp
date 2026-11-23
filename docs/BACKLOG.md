@@ -7,7 +7,7 @@ For where each story's code goes, see [ARCHITECTURE.md](ARCHITECTURE.md).
 |----|-----------|--------|--------|--------|
 | US-01 | As a user, I want to see the current temperature in Fahrenheit or Celsius so that I know how hot or cold it is right now. | 1 | 1 | In progress (°F/°C toggle missing) |
 | US-02 | As a user, I want to see an hourly forecast so that I can plan activities throughout the day. | 2 | 2 | To do |
-| US-03 | As a user, I want to see the weather forecast for the week so that I can plan ahead. | 2 | 2 | To do |
+| US-03 | As a user, I want to see the weather forecast for the week so that I can plan ahead. | 2 | 2 | Done |
 | US-04 | As a user, I want the app to show the weather where I am automatically, so that I don't have to search for it. | 3 | 1 | To do |
 | US-05 | As a commuter, I want to search for the weather in a specific city so that I can check the conditions for upcoming travel destinations. | 3 | 1 | Done (scaffold) |
 | US-06 | As a returning user, I want to have my favorite locations saved so that I can check the weather quickly. | 2 | 3 | To do |
