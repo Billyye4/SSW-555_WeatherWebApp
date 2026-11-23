@@ -11,4 +11,5 @@ test('addDays crosses month and year boundaries', () => {
 test('formatDay and formatWeekday', () => {
   assert.equal(Dates.formatDay('2026-11-28'), 'Sat, Nov 28');
   assert.equal(Dates.formatWeekday('2026-11-28'), 'Sat');
+  assert.equal(Dates.formatMonthDay('2026-11-28'), 'Nov 28');
 });

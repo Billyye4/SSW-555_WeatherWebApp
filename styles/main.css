@@ -74,4 +74,34 @@ dd { margin: 0; }
 
 .field input { flex: 0 1 12rem; color: #1b2430; }
 
+/* US-10 history chart */
+.chart-wrap { position: relative; margin-top: 0.5rem; }
+.history-chart { display: block; width: 100%; height: auto; overflow: visible; }
+.history-chart .grid { stroke: #e6e9ee; stroke-width: 1; }
+.history-chart .today { stroke: #9aa5b4; stroke-width: 1; }
+.history-chart .axis { fill: #5b6878; font-size: 11px; }
+.history-chart .series { fill: none; stroke: #2a78d6; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.history-chart .marker { fill: #2a78d6; stroke: #fff; stroke-width: 2; }
+.history-chart .crosshair { stroke: #9aa5b4; stroke-width: 1; }
+.history-chart .hit { fill: transparent; cursor: crosshair; }
+
+.chart-tooltip {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  padding: 0.35rem 0.6rem;
+  background: #1b2430;
+  color: #fff;
+  font-size: 0.8rem;
+  border-radius: 0.4rem;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+details { margin-top: 0.75rem; }
+summary { cursor: pointer; color: #2563eb; }
+.data-table { width: 100%; margin-top: 0.5rem; border-collapse: collapse; }
+.data-table th, .data-table td { padding: 0.25rem 0; text-align: left; border-bottom: 1px solid #eef1f5; }
+.data-table th { color: #5b6878; font-weight: 500; }
+
 [hidden] { display: none !important; }

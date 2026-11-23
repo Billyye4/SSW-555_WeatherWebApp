@@ -14,6 +14,13 @@ export class Dates {
     });
   }
 
+  // 'Nov 28'
+  static formatMonthDay(isoDate) {
+    return new Date(`${isoDate}T00:00:00Z`).toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric', timeZone: 'UTC',
+    });
+  }
+
   // 'Sat'
   static formatWeekday(isoDate) {
     return new Date(`${isoDate}T00:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });

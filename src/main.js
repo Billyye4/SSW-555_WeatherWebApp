@@ -8,6 +8,7 @@ import { PreferencesStore } from './storage/PreferencesStore.js';
 import { SearchBar } from './ui/SearchBar.js';
 import { CurrentWeatherView } from './ui/CurrentWeatherView.js';
 import { RainChanceView } from './ui/RainChanceView.js';
+import { HistoryView } from './ui/HistoryView.js';
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -20,6 +21,7 @@ const views = {
   search: new SearchBar($('#search'), { onSearch: (name) => app.search(name) }),
   current: new CurrentWeatherView($('#current-weather')),
   rainChance: new RainChanceView($('#rain-chance')),
+  history: new HistoryView($('#history')),
 };
 
 app = new App({

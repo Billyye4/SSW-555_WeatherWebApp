@@ -55,6 +55,10 @@ export class App {
     const report = this.#report;
     this.#views.current.render({ location: this.#location, current: report.current }, this.#unit);
     this.#views.rainChance.render(report);
+    this.#views.history.render(
+      { history: report.history(), week: report.week(), trend: report.trendVsLastWeek() },
+      this.#unit,
+    );
   }
 
   #setStatus(message) {

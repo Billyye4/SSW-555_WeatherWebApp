@@ -44,6 +44,22 @@
       </label>
       <p data-field="result" aria-live="polite"></p>
     </section>
+
+    <section id="history" class="card" hidden>
+      <h2>Daily highs: last week vs. this week</h2>
+      <p data-field="trend"></p>
+      <div class="chart-wrap">
+        <div data-field="chart"></div>
+        <div data-field="tooltip" class="chart-tooltip" hidden></div>
+      </div>
+      <details>
+        <summary>Show as table</summary>
+        <table class="data-table">
+          <thead><tr><th scope="col">Day</th><th scope="col">High</th></tr></thead>
+          <tbody data-field="table"></tbody>
+        </table>
+      </details>
+    </section>
   </main>
 </body>
 </html>
