@@ -53,9 +53,23 @@ export async function geocode(name) {
 }
 
 export async function getCurrent(lat, lon) {
-  const url = 'https://api.open-meteo.com/v1/forecast?timezone=auto'
+  const url = 'https://api.open-meteo.com/v1/forecast?timezone=auto&forecast_days=2'
     + `&latitude=${lat}&longitude=${lon}`
-    + '&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code';
+    + '&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code'
+    + '&hourly=temperature_2m,weather_code';
   const data = await getJSON(url);
-  return { ...data.current, units: data.current_units };
+  const hours = data.hourly.time.map((time, index) => ({
+    time,
+    temperature_2m: data.hourly.temperature_2m[index],
+    weather_code: data.hourly.weather_code[index],
+  }));
+  const firstFutureHour = hours.findIndex((hour) => hour.time >= data.current.time);
+  const start = firstFutureHour === -1 ? hours.length : firstFutureHour;
+
+  return {
+    ...data.current,
+    units: data.current_units,
+    hours: hours.slice(start, start + 24),
+    hourlyUnits: data.hourly_units,
+  };
 }
