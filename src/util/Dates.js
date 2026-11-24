@@ -25,4 +25,9 @@ export class Dates {
   static formatWeekday(isoDate) {
     return new Date(`${isoDate}T00:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
   }
+
+  // Minutes from one local 'YYYY-MM-DDTHH:mm' time to another. Both are read as UTC, so no time zone shifts them.
+  static minutesBetween(from, to) {
+    return Math.round((Date.parse(`${to}Z`) - Date.parse(`${from}Z`)) / 60_000);
+  }
 }

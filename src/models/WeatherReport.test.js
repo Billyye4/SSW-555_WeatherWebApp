@@ -160,3 +160,17 @@ test('week gives each day a high, low, and weather code for the 7-day forecast (
   );
   assert.deepEqual(week.map((d) => d.weatherCode), codes);
 });
+
+test('isDaytime is true between sunrise and sunset', () => {
+  // The fixture puts sunrise at 06:50 and sunset at 16:30.
+  const r = report();
+  assert.equal(r.isDaytime('2026-11-23T06:00'), false);
+  assert.equal(r.isDaytime('2026-11-23T06:50'), true);
+  assert.equal(r.isDaytime('2026-11-23T12:00'), true);
+  assert.equal(r.isDaytime('2026-11-23T16:30'), false);
+  assert.equal(r.isDaytime('2026-11-24T02:00'), false);
+});
+
+test('isDaytime assumes day for a date outside the report', () => {
+  assert.equal(report().isDaytime('2027-03-01T02:00'), true);
+});

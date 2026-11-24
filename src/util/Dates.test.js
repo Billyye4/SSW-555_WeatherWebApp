@@ -13,3 +13,9 @@ test('formatDay and formatWeekday', () => {
   assert.equal(Dates.formatWeekday('2026-11-28'), 'Sat');
   assert.equal(Dates.formatMonthDay('2026-11-28'), 'Nov 28');
 });
+
+test('minutesBetween subtracts local times without a time zone shift', () => {
+  assert.equal(Dates.minutesBetween('2026-11-23T06:52', '2026-11-23T16:32'), 580);
+  assert.equal(Dates.minutesBetween('2026-11-23T23:30', '2026-11-24T00:15'), 45);
+  assert.equal(Dates.minutesBetween('2026-11-23T16:32', '2026-11-23T14:15'), -137);
+});

@@ -1,50 +1,50 @@
-/* US-13: background gradient per weather theme.
-   Theme.js sets <body data-theme="<category>-<day|night>">.
-   Each theme's text color has at least 4.5:1 contrast against both ends of its gradient. */
+/* US-13: the page background follows the weather.
+   Theme.js sets <body data-theme="<category>-<day|night>">. Every theme is deep enough for white text:
+   at least 3:1 on the bare background (used only for large text) and 4.5:1 on the glass panels. */
 
-/* Registered as colors so the browser can animate between themes. A gradient can't transition otherwise. */
+/* Registered as colors so the browser can fade between themes. A gradient can't transition otherwise. */
 @property --sky-top {
   syntax: '<color>';
-  inherits: false;
-  initial-value: #eef4fb;
+  inherits: true;
+  initial-value: #2c5a96;
 }
 
 @property --sky-bottom {
   syntax: '<color>';
-  inherits: false;
-  initial-value: #eef4fb;
+  inherits: true;
+  initial-value: #4f77ad;
 }
+
+html { background: #2c5a96; }
 
 body {
   min-height: 100vh;
-  background: linear-gradient(var(--sky-top), var(--sky-bottom));
-  color: var(--sky-text, #1b2430);
-  transition: --sky-top 1s ease, --sky-bottom 1s ease, color 1s ease;
+  color: #fff;
+  transition: --sky-top 1.2s ease, --sky-bottom 1.2s ease;
+}
+
+/* A fixed layer behind the page, so the sky always fills the screen while scrolling. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(170deg, var(--sky-top), var(--sky-bottom));
 }
 
 @media (prefers-reduced-motion: reduce) {
   body { transition: none; }
 }
 
-body[data-theme='clear-day']    { --sky-top: #7fc0f5; --sky-bottom: #d6ecff; --sky-text: #1b2430; }
-body[data-theme='clear-night']  { --sky-top: #0f1f3d; --sky-bottom: #2a4a7f; --sky-text: #f5f7fa; }
-body[data-theme='cloudy-day']   { --sky-top: #aebccb; --sky-bottom: #e3e9ef; --sky-text: #1b2430; }
-body[data-theme='cloudy-night'] { --sky-top: #262d38; --sky-bottom: #454f5e; --sky-text: #f5f7fa; }
-body[data-theme='fog-day']      { --sky-top: #c9cfd5; --sky-bottom: #eceff2; --sky-text: #1b2430; }
-body[data-theme='fog-night']    { --sky-top: #30353b; --sky-bottom: #535a63; --sky-text: #f5f7fa; }
-body[data-theme='rain-day']     { --sky-top: #8ea4ba; --sky-bottom: #cfdbe6; --sky-text: #1b2430; }
-body[data-theme='rain-night']   { --sky-top: #18232f; --sky-bottom: #2f4256; --sky-text: #f5f7fa; }
-body[data-theme='snow-day']     { --sky-top: #dfe9f3; --sky-bottom: #ffffff; --sky-text: #1b2430; }
-body[data-theme='snow-night']   { --sky-top: #2b3a50; --sky-bottom: #4d5f78; --sky-text: #f5f7fa; }
-body[data-theme='storm-day']    { --sky-top: #4a4e69; --sky-bottom: #656985; --sky-text: #f5f7fa; }
-body[data-theme='storm-night']  { --sky-top: #121220; --sky-bottom: #2a2a42; --sky-text: #f5f7fa; }
-
-/* Text that sits directly on the background, not on a white card, follows the theme's text color.
-   Today that's the favorites heading, hint, and notifications link from US-06 and US-07. */
-body[data-theme] #favorites :is(.section-title, .hint, .link-button) {
-  color: var(--sky-text);
-}
-
-body[data-theme] #favorites .link-button {
-  text-decoration: underline;
-}
+body[data-theme='clear-day']    { --sky-top: #2161b0; --sky-bottom: #4684c8; }
+body[data-theme='clear-night']  { --sky-top: #0b1531; --sky-bottom: #1f3566; }
+body[data-theme='cloudy-day']   { --sky-top: #4a5c71; --sky-bottom: #6d8195; }
+body[data-theme='cloudy-night'] { --sky-top: #1b222c; --sky-bottom: #38424f; }
+body[data-theme='fog-day']      { --sky-top: #535f6a; --sky-bottom: #77838e; }
+body[data-theme='fog-night']    { --sky-top: #22282e; --sky-bottom: #444c55; }
+body[data-theme='rain-day']     { --sky-top: #36495c; --sky-bottom: #596e82; }
+body[data-theme='rain-night']   { --sky-top: #0e1823; --sky-bottom: #253545; }
+body[data-theme='snow-day']     { --sky-top: #4f6680; --sky-bottom: #748ba3; }
+body[data-theme='snow-night']   { --sky-top: #1d293a; --sky-bottom: #3b4a60; }
+body[data-theme='storm-day']    { --sky-top: #353b55; --sky-bottom: #545a76; }
+body[data-theme='storm-night']  { --sky-top: #0b0b17; --sky-bottom: #222238; }

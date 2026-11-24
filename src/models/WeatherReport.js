@@ -1,6 +1,7 @@
 import { CurrentConditions } from './CurrentConditions.js';
 import { HourlyForecast } from './HourlyForecast.js';
 import { DailyForecast } from './DailyForecast.js';
+import { Dates } from '../util/Dates.js';
 
 // Everything from one forecast request for one location.
 export class WeatherReport {
@@ -34,6 +35,13 @@ export class WeatherReport {
     const thisHour = `${this.current.time.slice(0, 13)}:00`;
     const start = this.hourly.findIndex((h) => h.time >= thisHour);
     return start === -1 ? [] : this.hourly.slice(start, start + n);
+  }
+
+  // Whether the sun is up at a local 'YYYY-MM-DDTHH:mm' time. Assumes day when the report has no sun times for that date.
+  isDaytime(isoDateTime) {
+    const sun = this.sunTimesOn(isoDateTime.slice(0, 10));
+    if (!sun) return true;
+    return isoDateTime >= sun.sunrise && isoDateTime < sun.sunset;
   }
 
   // US-09: the dates a user can ask about, today through the last forecast day.
@@ -86,11 +94,6 @@ export class WeatherReport {
     const sun = this.sunTimesOn();
     if (!sun) return 0;
     const from = this.current.time > sun.sunrise ? this.current.time : sun.sunrise;
-    return Math.max(0, minutesBetween(from, sun.sunset));
+    return Math.max(0, Dates.minutesBetween(from, sun.sunset));
   }
-}
-
-// Both times are local to the location, so read them as UTC to subtract them without any time zone shift.
-function minutesBetween(from, to) {
-  return Math.round((Date.parse(`${to}Z`) - Date.parse(`${from}Z`)) / 60_000);
 }

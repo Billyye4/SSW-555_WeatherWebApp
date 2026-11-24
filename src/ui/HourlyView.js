@@ -1,7 +1,11 @@
+import { Icons } from './Icons.js';
 import { Units } from '../util/Units.js';
 import { WeatherCodes } from '../util/WeatherCodes.js';
 
-// The next 24 hours as a row of small cards that scrolls sideways (US-02).
+// Show the chance of precipitation under an hour's icon only when it's worth noticing.
+const PRECIP_SHOWN_FROM = 20;
+
+// The next 24 hours as a row that scrolls sideways (US-02).
 export class HourlyView {
   #root;
   #list;
@@ -11,8 +15,9 @@ export class HourlyView {
     this.#list = rootEl.querySelector('[data-field="list"]');
   }
 
-  render(hours, unit) {
-    this.#list.replaceChildren(...hours.map((hour) => this.#card(hour, unit)));
+  // isDay(time) picks the sun or moon icon for each hour.
+  render(hours, unit, { isDay = () => true } = {}) {
+    this.#list.replaceChildren(...hours.map((hour, i) => this.#item(hour, i === 0, unit, isDay(hour.time))));
     this.#root.hidden = hours.length === 0;
   }
 
@@ -22,25 +27,23 @@ export class HourlyView {
     return `${hour % 12 || 12} ${hour >= 12 ? 'PM' : 'AM'}`;
   }
 
-  #card(hour, unit) {
-    const { label, icon } = WeatherCodes.describe(hour.weatherCode);
-    const card = this.#el('article', 'hourly-item');
+  #item(hour, isNow, unit, isDay) {
+    const li = this.#el('li', 'hour');
 
-    const time = this.#el('time', null, HourlyView.formatHour(hour.time));
+    const time = this.#el('time', 'hour-time', isNow ? 'Now' : HourlyView.formatHour(hour.time));
     time.dateTime = hour.time;
-    time.setAttribute('aria-label', `${hour.time.replace('T', ' ')}, ${label}`);
 
-    const iconEl = this.#el('span', 'hourly-icon', icon);
-    iconEl.setAttribute('aria-hidden', 'true');
+    // Icons.svg returns fixed markup with no API data in it.
+    const icon = this.#el('span', 'hour-icon');
+    icon.innerHTML = Icons.svg(hour.weatherCode, isDay);
 
-    const temperature = hour.temperatureC == null ? '–' : Units.formatTemp(hour.temperatureC, unit);
-    card.append(
-      time,
-      iconEl,
-      this.#el('span', 'hourly-description', label),
-      this.#el('span', 'hourly-temperature', temperature),
-    );
-    return card;
+    const precip = this.#el('span', 'hour-precip',
+      hour.precipChance >= PRECIP_SHOWN_FROM ? `${hour.precipChance}%` : '');
+
+    const temp = this.#el('span', 'hour-temp', hour.temperatureC == null ? '–' : `${Units.temp(hour.temperatureC, unit)}°`);
+
+    li.append(time, icon, this.#el('span', 'visually-hidden', WeatherCodes.describe(hour.weatherCode).label), precip, temp);
+    return li;
   }
 
   #el(tag, className, text) {
