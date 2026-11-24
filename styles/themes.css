@@ -1,6 +1,7 @@
 /* US-13: the band behind the current conditions follows the weather.
-   Theme.js sets <body data-theme="<category>-<day|night>">. A 20% dark scrim over every theme keeps
-   white text at 5:1 or better on the band. */
+   Theme.js sets <body data-theme="<category>-<day|night>">. WeatherScene draws clouds, rain, and so on
+   on a canvas over the gradient. A 20% dark scrim sits above both, which keeps white text at 5:1 or
+   better on every theme. */
 
 /* Registered as colors so the browser can fade between themes. A gradient can't transition otherwise. */
 @property --sky-top {
@@ -20,11 +21,17 @@ body {
 }
 
 .band {
-  background:
-    linear-gradient(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.2)),
-    linear-gradient(160deg, var(--sky-top), var(--sky-bottom));
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(160deg, var(--sky-top), var(--sky-bottom));
   color: #fff;
 }
+
+/* Stacking: gradient, then the animation canvas, then the scrim, then the text. */
+.band-canvas { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
+.band::after { content: ''; position: absolute; inset: 0; z-index: 1; background: rgb(0 0 0 / 0.2); pointer-events: none; }
+.band > .container { position: relative; z-index: 2; }
 
 @media (prefers-reduced-motion: reduce) {
   body { transition: none; }

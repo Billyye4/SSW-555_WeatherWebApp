@@ -1,0 +1,2 @@
+three.js r187 (npm three@0.187.0), unmodified files from its build/ folder. MIT license, see LICENSE.
+Used by src/ui/WeatherScene.js for the animated weather band (US-13).
