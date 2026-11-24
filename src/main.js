@@ -11,6 +11,7 @@ import { SearchBar } from './ui/SearchBar.js';
 import { UnitToggle } from './ui/UnitToggle.js';
 import { CurrentWeatherView } from './ui/CurrentWeatherView.js';
 import { HourlyView } from './ui/HourlyView.js';
+import { WeeklyView } from './ui/WeeklyView.js';
 import { RainChanceView } from './ui/RainChanceView.js';
 import { HistoryView } from './ui/HistoryView.js';
 import { SunView } from './ui/SunView.js';
@@ -38,6 +39,7 @@ const views = {
   unitToggle: new UnitToggle($('#unit-toggle'), { onChange: (unit) => app.setUnit(unit) }),
   current: new CurrentWeatherView($('#current-weather'), { onToggleFavorite: () => app.toggleFavorite() }),
   hourly: new HourlyView($('#hourly')),
+  weekly: new WeeklyView($('#weekly')),
   rainChance: new RainChanceView($('#rain-chance')),
   history: new HistoryView($('#history')),
   sun: new SunView($('#sun')),
