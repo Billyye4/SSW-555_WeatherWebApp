@@ -30,32 +30,21 @@ const CODES = {
   99: ['Thunderstorm with hail', '⛈️'],
 };
 
-export function describe(code) {
-  return CODES[code] ?? ['Unknown', '❓'];
+function categoryOf(code) {
+  if (code <= 1) return 'clear';
+  if (code <= 3) return 'cloudy';
+  if (code <= 48) return 'fog';
+  if (code >= 95) return 'storm';
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
+  return 'rain';
 }
 
-async function getJSON(url) {
-  let res;
-  try {
-    res = await fetch(url);
-  } catch {
-    throw new Error('Network error. Check your connection and try again.');
+export class WeatherCodes {
+  // Returns { label, icon, category }. category is clear, cloudy, fog, rain, snow, or storm.
+  static describe(code) {
+    const entry = CODES[code];
+    if (!entry) return { label: 'Unknown', icon: '❓', category: 'cloudy' };
+    const [label, icon] = entry;
+    return { label, icon, category: categoryOf(code) };
   }
-  if (!res.ok) throw new Error('Weather service is unavailable. Try again later.');
-  return res.json();
-}
-
-export async function geocode(name) {
-  const url = `https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&name=${encodeURIComponent(name)}`;
-  const data = await getJSON(url);
-  if (!data.results?.length) throw new Error(`No city found for "${name}".`);
-  return data.results[0];
-}
-
-export async function getCurrent(lat, lon) {
-  const url = 'https://api.open-meteo.com/v1/forecast?timezone=auto'
-    + `&latitude=${lat}&longitude=${lon}`
-    + '&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code';
-  const data = await getJSON(url);
-  return { ...data.current, units: data.current_units };
 }

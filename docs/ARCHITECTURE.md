@@ -87,8 +87,13 @@ SSW-555_WeatherWebApp/
     ├── util/
     │   ├── Units.js
     │   ├── Units.test.js
+    │   ├── Dates.js
+    │   ├── Dates.test.js
     │   ├── WeatherCodes.js
     │   └── WeatherCodes.test.js
+    ├── testing/                Test helpers only, never imported by the app
+    │   ├── forecastFixture.js  Builds fake Open-Meteo forecast responses
+    │   └── fakeStorage.js      In-memory stand-in for localStorage
     └── ui/
         ├── Theme.js
         ├── Theme.test.js       Tests the pure themeFor() only
@@ -107,11 +112,11 @@ SSW-555_WeatherWebApp/
 
 `index.html` loads the app with `<script type="module" src="src/main.js"></script>` and links both stylesheets.
 
-### Migrating from the current scaffold
+### Migration from the original scaffold
 
-The scaffold's flat files map onto the new layout like this. Move each piece when you first touch it, and delete the old file once it's empty.
+The foundation PR (branch `US-00-src-foundation`) moved the original flat files into this layout and deleted them. This table is kept so you can find where old code went.
 
-| Today | Moves to |
+| Was | Now |
 |-------|----------|
 | `weather.js` `getJSON()` | `HttpClient.getJSON()` |
 | `weather.js` `geocode()` | `GeocodingService.search()` |
@@ -128,7 +133,8 @@ The scaffold's flat files map onto the new layout like this. Move each piece whe
 - **One class per file.** The file is named after the class in PascalCase (`WeatherService.js` exports `WeatherService`). The only lowercase file is the entry point, `main.js`.
 - **Named exports only.** Use `export class WeatherService {}`, not `export default`, so imports and file names always match.
 - **Tests sit next to the code** as `<ClassName>.test.js`. `node --test` finds them automatically.
-- **Folders are lowercase and plural**, except `app/` and `util/`.
+- **Shared test helpers go in `src/testing/`.** The folder is deliberately not named `test/`, because `node --test` would run every file inside a `test/` folder as a test.
+- **Folders are lowercase and plural**, except `app/`, `util/`, and `testing/`.
 
 ### Code style
 - Write import paths as relative paths **with the `.js` extension** (`import { Units } from '../util/Units.js'`). Browsers need the extension to load modules.
@@ -331,9 +337,21 @@ This is the fallback outside the US. It flags dangerous conditions in the next 3
 |--------|---------|
 | `cToF(c)` | `cToF(20)` → `68` |
 | `kmhToMph(kmh)` | `kmhToMph(16.09)` → `10` |
+| `temp(c, unit)` | `temp(13.7, 'F')` → `57` (rounded number, never `-0`) |
 | `formatTemp(c, unit)` | `formatTemp(13.7, 'F')` → `"57°F"` |
+| `formatSpeed(kmh, unit)` | `formatSpeed(18.8, 'F')` → `"12 mph"` |
 | `formatWind(kmh, deg, unit)` | `formatWind(18.8, 331, 'F')` → `"12 mph NNW"` |
 | `degreesToCompass(deg)` | `degreesToCompass(331)` → `"NNW"` (16 points) |
+
+#### `Dates` (static)
+Helpers for Open-Meteo's `YYYY-MM-DD` strings. The math is done in UTC, so the viewer's own time zone never shifts a date.
+
+| Method | Example |
+|--------|---------|
+| `addDays(date, n)` | `addDays('2026-12-31', 1)` → `'2027-01-01'` |
+| `formatDay(date)` | `formatDay('2026-11-28')` → `'Sat, Nov 28'` |
+| `formatMonthDay(date)` | `formatMonthDay('2026-11-28')` → `'Nov 28'` |
+| `formatWeekday(date)` | `formatWeekday('2026-11-28')` → `'Sat'` |
 
 #### `WeatherCodes` (static)
 
