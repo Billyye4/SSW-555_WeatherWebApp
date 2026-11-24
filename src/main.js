@@ -10,6 +10,7 @@ import { SearchBar } from './ui/SearchBar.js';
 import { CurrentWeatherView } from './ui/CurrentWeatherView.js';
 import { RainChanceView } from './ui/RainChanceView.js';
 import { HistoryView } from './ui/HistoryView.js';
+import { SunView } from './ui/SunView.js';
 import { FavoritesView } from './ui/FavoritesView.js';
 import { AlertService } from './services/AlertService.js';
 import { NwsAlertProvider } from './services/NwsAlertProvider.js';
@@ -32,6 +33,7 @@ const views = {
   current: new CurrentWeatherView($('#current-weather'), { onToggleFavorite: () => app.toggleFavorite() }),
   rainChance: new RainChanceView($('#rain-chance')),
   history: new HistoryView($('#history')),
+  sun: new SunView($('#sun')),
   favorites: new FavoritesView($('#favorites'), {
     onSelect: (location) => app.loadLocation(location),
     onRemove: (id) => app.removeFavorite(id),

@@ -114,6 +114,10 @@ export class App {
       { history: report.history(), week: report.week(), trend: report.trendVsLastWeek() },
       this.#unit,
     );
+    this.#views.sun.render({
+      sun: report.sunTimesOn(),
+      daylightMinutes: report.daylightRemainingMinutes(),
+    });
   }
 
   #renderFavorites() {
