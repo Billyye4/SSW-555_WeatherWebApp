@@ -41,3 +41,11 @@ test('formatSpeed uses km/h for C and mph for F', () => {
   assert.equal(Units.formatSpeed(18.8, 'C'), '19 km/h');
   assert.equal(Units.formatSpeed(18.8, 'F'), '12 mph');
 });
+
+test('formats the values the °F/°C toggle switches between (US-01)', () => {
+  assert.equal(Units.formatTemp(20, 'C'), '20°C');
+  assert.equal(Units.formatTemp(20, 'F'), '68°F');
+  assert.equal(Units.formatTemp(-40, 'F'), '-40°F');
+  assert.equal(Units.formatSpeed(16.09344, 'C'), '16 km/h');
+  assert.equal(Units.formatSpeed(16.09344, 'F'), '10 mph');
+});

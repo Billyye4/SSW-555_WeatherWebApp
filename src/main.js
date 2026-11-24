@@ -8,6 +8,7 @@ import { LocalStore } from './storage/LocalStore.js';
 import { PreferencesStore } from './storage/PreferencesStore.js';
 import { FavoritesStore } from './storage/FavoritesStore.js';
 import { SearchBar } from './ui/SearchBar.js';
+import { UnitToggle } from './ui/UnitToggle.js';
 import { CurrentWeatherView } from './ui/CurrentWeatherView.js';
 import { RainChanceView } from './ui/RainChanceView.js';
 import { HistoryView } from './ui/HistoryView.js';
@@ -33,6 +34,7 @@ notifier.attach($('#notify-button'));
 let app;
 const views = {
   search: new SearchBar($('#search'), { onSearch: (name) => app.search(name) }),
+  unitToggle: new UnitToggle($('#unit-toggle'), { onChange: (unit) => app.setUnit(unit) }),
   current: new CurrentWeatherView($('#current-weather'), { onToggleFavorite: () => app.toggleFavorite() }),
   rainChance: new RainChanceView($('#rain-chance')),
   history: new HistoryView($('#history')),
