@@ -13,6 +13,7 @@ import { RainChanceView } from './ui/RainChanceView.js';
 import { HistoryView } from './ui/HistoryView.js';
 import { SunView } from './ui/SunView.js';
 import { PollenView } from './ui/PollenView.js';
+import { Theme } from './ui/Theme.js';
 import { FavoritesView } from './ui/FavoritesView.js';
 import { AlertService } from './services/AlertService.js';
 import { NwsAlertProvider } from './services/NwsAlertProvider.js';
@@ -54,5 +55,6 @@ app = new App({
   alerts: new AlertService(new NwsAlertProvider(http), new RuleAlertProvider(), weather),
   notifier,
   airQuality: new AirQualityService(http),
+  theme: new Theme(),
 });
 app.init();

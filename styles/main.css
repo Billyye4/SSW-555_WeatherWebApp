@@ -35,6 +35,7 @@ button {
   margin-top: 1rem;
   padding: 1.5rem;
   background: #fff;
+  color: #1b2430; /* Stays dark on night themes, where the page text turns light (US-13). */
   border-radius: 1rem;
   box-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
 }
