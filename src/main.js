@@ -8,6 +8,8 @@ import { LocalStore } from './storage/LocalStore.js';
 import { PreferencesStore } from './storage/PreferencesStore.js';
 import { FavoritesStore } from './storage/FavoritesStore.js';
 import { SearchBar } from './ui/SearchBar.js';
+import { OtherMatchesView } from './ui/OtherMatchesView.js';
+import { StatusView } from './ui/StatusView.js';
 import { UnitToggle } from './ui/UnitToggle.js';
 import { CurrentWeatherView } from './ui/CurrentWeatherView.js';
 import { HourlyView } from './ui/HourlyView.js';
@@ -35,7 +37,12 @@ notifier.attach($('#notify-button'));
 // Views call back into the app, which is created right after them.
 let app;
 const views = {
-  search: new SearchBar($('#search'), { onSearch: (name) => app.search(name) }),
+  search: new SearchBar($('#search'), {
+    onSearch: (name) => app.search(name),
+    onSuggest: (query) => app.suggest(query),
+    onSelect: (location) => app.loadLocation(location),
+  }),
+  matches: new OtherMatchesView($('#other-matches'), { onSelect: (location) => app.loadLocation(location) }),
   unitToggle: new UnitToggle($('#unit-toggle'), { onChange: (unit) => app.setUnit(unit) }),
   current: new CurrentWeatherView($('#current-weather'), { onToggleFavorite: () => app.toggleFavorite() }),
   hourly: new HourlyView($('#hourly')),
@@ -53,7 +60,7 @@ const views = {
 
 app = new App({
   views,
-  statusEl: $('#status'),
+  status: new StatusView($('#status'), $('#search-error')),
   geocoding: new GeocodingService(http),
   weather,
   prefs: new PreferencesStore(store),

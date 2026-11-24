@@ -12,12 +12,22 @@
   <main>
     <h1>Weather</h1>
 
-    <form id="search">
-      <input name="city" placeholder="Search for a city" aria-label="City" autocomplete="off" required>
-      <button>Search</button>
+    <form id="search" class="search" role="search" novalidate>
+      <div class="search-box">
+        <input name="city" placeholder="Search for a city" aria-label="City" autocomplete="off"
+          role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-suggestions">
+        <ul id="search-suggestions" class="suggestions" role="listbox" aria-label="Matching cities" hidden></ul>
+      </div>
+      <button type="submit">Search</button>
     </form>
 
     <p id="status" role="status"></p>
+    <p id="search-error" class="error-alert" role="alert" hidden></p>
+
+    <nav id="other-matches" class="other-matches" aria-label="Other matching places" hidden>
+      <span class="other-matches-label">Did you mean:</span>
+      <ul data-field="list"></ul>
+    </nav>
 
     <fieldset id="unit-toggle">
       <legend>Temperature unit</legend>

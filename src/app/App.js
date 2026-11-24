@@ -3,7 +3,7 @@ export class App {
   static ALERT_POLL_MS = 15 * 60 * 1000;
 
   #views;
-  #statusEl;
+  #status;
   #geocoding;
   #weather;
   #prefs;
@@ -19,11 +19,12 @@ export class App {
   #currentAlerts = [];
   #favoriteAlerts = new Map();
   #pollen; // PollenReport, null where there's no data, or undefined while it loads
+  #matches = []; // US-05: every place the last search matched
   #loadId = 0;
 
-  constructor({ views, statusEl, geocoding, weather, prefs, favorites, alerts, notifier, airQuality, theme }) {
+  constructor({ views, status, geocoding, weather, prefs, favorites, alerts, notifier, airQuality, theme }) {
     this.#views = views;
-    this.#statusEl = statusEl;
+    this.#status = status;
     this.#geocoding = geocoding;
     this.#weather = weather;
     this.#prefs = prefs;
@@ -43,21 +44,39 @@ export class App {
     setInterval(() => this.refreshFavoriteAlerts(), App.ALERT_POLL_MS);
   }
 
+  // US-05: load the best match and keep the others so the user can switch to them.
   async search(name) {
     const loadId = ++this.#loadId;
-    this.#setStatus('Loading…');
+    this.#views.search.setBusy(true);
+    this.#status.loading('Searching…');
     try {
-      const location = await this.#geocoding.search(name);
-      if (loadId === this.#loadId) await this.loadLocation(location);
+      const matches = await this.#geocoding.searchMany(name);
+      if (loadId !== this.#loadId) return;
+      this.#matches = matches;
+      await this.loadLocation(matches[0]);
     } catch (err) {
-      if (loadId === this.#loadId) this.#setStatus(err.message);
+      if (loadId !== this.#loadId) return;
+      this.#status.error(err.message);
+      this.#views.search.setBusy(false);
+    }
+  }
+
+  // US-05: suggestions while typing. Failures just mean no suggestions.
+  async suggest(query) {
+    try {
+      return await this.#geocoding.searchMany(query);
+    } catch {
+      return [];
     }
   }
 
   async loadLocation(location) {
     // If the user starts another search while this one is loading, only the newest one renders.
     const loadId = ++this.#loadId;
-    this.#setStatus('Loading…');
+    // Keep the "other matches" list only while the user is moving between those matches.
+    if (!this.#matches.some((place) => place.id === location.id)) this.#matches = [];
+    this.#views.search.setBusy(true);
+    this.#status.loading();
     try {
       const report = await this.#weather.getReport(location);
       if (loadId !== this.#loadId) return;
@@ -68,10 +87,13 @@ export class App {
       this.#render();
       this.#renderFavorites();
       this.#renderAlerts();
-      this.#setStatus('');
+      this.#views.matches.render(this.#matches, location.id);
+      this.#status.clear();
     } catch (err) {
-      if (loadId === this.#loadId) this.#setStatus(err.message);
+      if (loadId === this.#loadId) this.#status.error(err.message);
       return;
+    } finally {
+      if (loadId === this.#loadId) this.#views.search.setBusy(false);
     }
 
     // Alerts and pollen (US-11) load after the weather so they never hold it up.
@@ -159,9 +181,5 @@ export class App {
       entries.push({ location, alerts: this.#favoriteAlerts.get(location.id) ?? [], isCurrent: false });
     }
     this.#views.alerts.render(entries);
-  }
-
-  #setStatus(message) {
-    this.#statusEl.textContent = message;
   }
 }
