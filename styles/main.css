@@ -104,4 +104,26 @@ summary { cursor: pointer; color: #2563eb; }
 .data-table th, .data-table td { padding: 0.25rem 0; text-align: left; border-bottom: 1px solid #eef1f5; }
 .data-table th { color: #5b6878; font-weight: 500; }
 
+/* US-06 favorites */
+.section-title { margin: 1rem 0 0.4rem; font-size: 0.85rem; font-weight: 600; color: #5b6878; }
+.hint { margin: 0; color: #5b6878; font-size: 0.9rem; }
+
+.favorite-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.favorite-item { display: flex; border: 1px solid #b8c4d4; border-radius: 999px; background: #fff; overflow: hidden; }
+.favorite-item button { background: none; border: 0; border-radius: 0; color: #1b2430; padding: 0.35rem 0.7rem; }
+.favorite-item .favorite-open[aria-current="true"] { font-weight: 600; color: #2563eb; }
+.favorite-item .favorite-remove { padding: 0.35rem 0.6rem 0.35rem 0.2rem; color: #5b6878; }
+.favorite-item button:hover { background: #eef4fb; }
+
+.card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+.favorite-toggle {
+  flex: none;
+  padding: 0 0.3rem;
+  background: none;
+  border: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #eda100;
+}
+
 [hidden] { display: none !important; }
