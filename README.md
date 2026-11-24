@@ -2,6 +2,7 @@
 
 SSW 555 Scrum group project: a weather forecast web app.
 
+- Choose Fahrenheit or Celsius for the displayed temperatures.
 - Search for a city to see current conditions and hourly temperature and weather for the next 24 hours.
 - Plain HTML, CSS, and JavaScript modules. No framework, no build step.
 - Weather data from [Open-Meteo](https://open-meteo.com/). It's free and needs no API key.
@@ -28,15 +29,20 @@ Tests use Node's built-in test runner. Put new tests next to the code, named `*.
 
 ## Project layout
 
-This is the current scaffold. The target layout (`src/` with one class per file) and how each file migrates into it are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#3-directory-structure).
+One class per file, with its tests next to it. The full tree and conventions are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#3-directory-structure).
 
-| File | Purpose |
+| Path | Purpose |
 |------|---------|
-| `index.html` | Page markup |
-| `style.css` | Styles |
-| `app.js` | Page logic (events, rendering) |
-| `weather.js` | API calls and helpers (no DOM, so it's testable) |
-| `weather.test.js` | Tests for `weather.js` |
+| `index.html` | Page markup: one `<section>` per view |
+| `styles/` | Stylesheets |
+| `src/main.js` | Entry point: creates every object and wires them together |
+| `src/app/` | `App`, which owns the state and coordinates everything |
+| `src/services/` | API calls (Open-Meteo, NWS). No DOM, so they're testable |
+| `src/models/` | Data classes such as `Location` and `WeatherReport` |
+| `src/storage/` | Saved preferences and favorites (`localStorage`) |
+| `src/util/` | Pure helpers: units, dates, weather codes |
+| `src/ui/` | Views that render into the page |
+| `src/testing/` | Test helpers (fake API responses, fake storage) |
 
 ## Team workflow
 
