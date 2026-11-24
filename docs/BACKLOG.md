@@ -5,7 +5,7 @@ For where each story's code goes, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 | ID | User story | Points | Sprint | Status |
 |----|-----------|--------|--------|--------|
-| US-01 | As a user, I want to see the current temperature in Fahrenheit or Celsius so that I know how hot or cold it is right now. | 1 | 1 | In progress (°F/°C toggle missing) |
+| US-01 | As a user, I want to see the current temperature in Fahrenheit or Celsius so that I know how hot or cold it is right now. | 1 | 1 | Done |
 | US-02 | As a user, I want to see an hourly forecast so that I can plan activities throughout the day. | 2 | 2 | To do |
 | US-03 | As a user, I want to see the weather forecast for the week so that I can plan ahead. | 2 | 2 | To do |
 | US-04 | As a user, I want the app to show the weather where I am automatically, so that I don't have to search for it. | 3 | 1 | To do |

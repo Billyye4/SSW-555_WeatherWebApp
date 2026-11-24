@@ -36,6 +36,7 @@ export class App {
 
   init() {
     this.#unit = this.#prefs.getUnit();
+    this.#views.unitToggle.render(this.#unit);
     this.#renderFavorites();
     // On load the banner already shows current alerts, so don't also pop notifications for them.
     this.refreshFavoriteAlerts({ silent: true });
@@ -84,6 +85,14 @@ export class App {
     this.#pollen = pollen;
     this.#renderAlerts();
     this.#views.pollen.render(pollen);
+  }
+
+  // US-01: switch between °F and °C. Re-renders from the cached report without fetching again.
+  setUnit(unit) {
+    this.#prefs.setUnit(unit);
+    this.#unit = unit;
+    this.#views.unitToggle.render(unit);
+    this.#render();
   }
 
   // US-06: save or unsave the location on screen.
