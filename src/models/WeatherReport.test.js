@@ -110,3 +110,34 @@ test('daylightRemainingMinutes is 0 at and after sunset', () => {
   assert.equal(at('16:30').daylightRemainingMinutes(), 0);
   assert.equal(at('23:45').daylightRemainingMinutes(), 0);
 });
+
+// US-02. Two days of hours, where each hour's temperature is its index (0–47).
+function withTwoDaysOfHours(now) {
+  const times = Array.from({ length: 48 }, (_, i) => `2026-11-${i < 24 ? 23 : 24}T${String(i % 24).padStart(2, '0')}:00`);
+  const json = forecastJson({ current: { time: now } });
+  json.hourly = {
+    time: times,
+    temperature_2m: times.map((_, i) => i),
+    precipitation_probability: times.map(() => 0),
+    weather_code: times.map(() => 2),
+  };
+  return WeatherReport.fromApi(place, json);
+}
+
+test('nextHours returns 24 hours starting with the current hour (US-02)', () => {
+  const hours = withTwoDaysOfHours('2026-11-23T18:00').nextHours();
+  assert.equal(hours.length, 24);
+  assert.equal(hours[0].time, '2026-11-23T18:00');
+  assert.equal(hours[0].temperatureC, 18);
+  assert.equal(hours[0].weatherCode, 2);
+  assert.equal(hours.at(-1).time, '2026-11-24T17:00');
+});
+
+test('nextHours includes the current hour when it is partway through (US-02)', () => {
+  assert.equal(withTwoDaysOfHours('2026-11-23T18:15').nextHours()[0].time, '2026-11-23T18:00');
+});
+
+test('nextHours returns fewer hours near the end of the forecast (US-02)', () => {
+  const hours = withTwoDaysOfHours('2026-11-24T20:00').nextHours(24);
+  assert.deepEqual(hours.map((h) => h.time), ['2026-11-24T20:00', '2026-11-24T21:00', '2026-11-24T22:00', '2026-11-24T23:00']);
+});

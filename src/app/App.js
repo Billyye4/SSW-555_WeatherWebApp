@@ -130,6 +130,7 @@ export class App {
     const report = this.#report;
     const isFavorite = this.#favorites.has(this.#location.id);
     this.#views.current.render({ location: this.#location, current: report.current, isFavorite }, this.#unit);
+    this.#views.hourly.render(report.nextHours(24), this.#unit);
     this.#views.rainChance.render(report);
     this.#views.history.render(
       { history: report.history(), week: report.week(), trend: report.trendVsLastWeek() },
