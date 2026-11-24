@@ -1,6 +1,6 @@
-/* US-13: the page background follows the weather.
-   Theme.js sets <body data-theme="<category>-<day|night>">. Every theme is deep enough for white text:
-   at least 3:1 on the bare background (used only for large text) and 4.5:1 on the glass panels. */
+/* US-13: the band behind the current conditions follows the weather.
+   Theme.js sets <body data-theme="<category>-<day|night>">. A 20% dark scrim over every theme keeps
+   white text at 5:1 or better on the band. */
 
 /* Registered as colors so the browser can fade between themes. A gradient can't transition otherwise. */
 @property --sky-top {
@@ -15,21 +15,15 @@
   initial-value: #4f77ad;
 }
 
-html { background: #2c5a96; }
-
 body {
-  min-height: 100vh;
-  color: #fff;
   transition: --sky-top 1.2s ease, --sky-bottom 1.2s ease;
 }
 
-/* A fixed layer behind the page, so the sky always fills the screen while scrolling. */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(170deg, var(--sky-top), var(--sky-bottom));
+.band {
+  background:
+    linear-gradient(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.2)),
+    linear-gradient(160deg, var(--sky-top), var(--sky-bottom));
+  color: #fff;
 }
 
 @media (prefers-reduced-motion: reduce) {

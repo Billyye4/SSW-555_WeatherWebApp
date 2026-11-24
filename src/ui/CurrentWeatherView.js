@@ -1,4 +1,5 @@
 import { Icons } from './Icons.js';
+import { Dates } from '../util/Dates.js';
 import { Units } from '../util/Units.js';
 import { WeatherCodes } from '../util/WeatherCodes.js';
 
@@ -23,6 +24,7 @@ export class CurrentWeatherView {
     f.place.textContent = location.name;
     f.region.textContent = [location.region, location.country].filter(Boolean).join(', ');
     f.region.hidden = !f.region.textContent;
+    f.asOf.textContent = `As of ${Dates.formatTime(current.time)} local time`;
 
     // Icons.svg returns fixed markup with no API data in it.
     f.icon.innerHTML = Icons.svg(current.weatherCode, current.isDay);

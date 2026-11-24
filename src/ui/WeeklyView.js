@@ -40,9 +40,12 @@ export class WeeklyView {
     const li = this.#el('li', 'day');
     const degrees = (c) => (c == null ? '–' : `${Units.temp(c, unit)}°`);
 
-    const name = this.#el('time', 'day-name', isToday ? 'Today' : Dates.formatWeekday(day.date));
+    const name = this.#el('time', 'day-name');
     name.dateTime = day.date;
-    name.title = Dates.formatDay(day.date);
+    name.append(
+      this.#el('span', 'day-weekday', isToday ? 'Today' : Dates.formatWeekday(day.date)),
+      this.#el('span', 'day-date', Dates.formatMonthDay(day.date)),
+    );
 
     // Icons.svg returns fixed markup with no API data in it.
     const icon = this.#el('span', 'day-icon');
@@ -56,9 +59,10 @@ export class WeeklyView {
     high.append(this.#el('span', 'visually-hidden', 'High '), degrees(day.highC));
 
     const cond = this.#el('span', 'day-cond');
-    cond.append(icon, this.#el('span', 'visually-hidden', WeatherCodes.describe(day.weatherCode).label), precip);
+    cond.append(icon, precip);
 
-    li.append(name, cond, low, this.#bar(day, scale, currentC), high);
+    li.append(name, cond, this.#el('span', 'day-desc', WeatherCodes.describe(day.weatherCode).label),
+      low, this.#bar(day, scale, currentC), high);
     return li;
   }
 

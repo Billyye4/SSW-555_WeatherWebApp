@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#2c5a96">
+  <meta name="theme-color" content="#10294a">
   <title>Weather</title>
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/themes.css">
   <script type="module" src="src/main.js"></script>
 </head>
 <body>
-  <div class="app">
-    <header class="topbar glass">
+  <header class="topbar">
+    <div class="container">
       <div class="topbar-row">
         <h1 class="brand">
           <svg viewBox="0 0 64 64" class="brand-icon" aria-hidden="true" focusable="false"><g stroke="#ffc83d" stroke-width="3.5" stroke-linecap="round"><line x1="37" y1="22" x2="42" y2="22"/><line x1="33.2" y1="31.2" x2="36.7" y2="34.7"/><line x1="24" y1="35" x2="24" y2="40"/><line x1="14.8" y1="31.2" x2="11.3" y2="34.7"/><line x1="11" y1="22" x2="6" y2="22"/><line x1="14.8" y1="12.8" x2="11.3" y2="9.3"/><line x1="24" y1="9" x2="24" y2="4"/><line x1="33.2" y1="12.8" x2="36.7" y2="9.3"/></g><circle cx="24" cy="22" r="9" fill="#ffc83d"/><path transform="translate(6 4) scale(0.95)" fill="#f2f6fb" d="M18 48h28a10 10 0 0 0 1.5-19.9A14 14 0 0 0 20.6 25.3 11.5 11.5 0 0 0 18 48z"/></svg>
@@ -20,10 +20,8 @@
 
         <form id="search" class="search" role="search">
           <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
-          <input name="city" placeholder="Search for a city" aria-label="City" autocomplete="off" required>
-          <button aria-label="Search" title="Search">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </button>
+          <input name="city" placeholder="Search city" aria-label="City" autocomplete="off" required>
+          <button>Search</button>
         </form>
 
         <fieldset id="unit-toggle" class="segmented">
@@ -34,135 +32,127 @@
       </div>
 
       <section id="favorites" class="favorites" aria-labelledby="favorites-title">
-        <h2 id="favorites-title" class="favorites-title">Saved places</h2>
+        <h2 id="favorites-title" class="favorites-title">Saved</h2>
         <ul data-field="list" class="favorite-list"></ul>
-        <p data-field="empty" class="hint">Press ☆ next to a city's name to save it here.</p>
+        <p data-field="empty" class="hint">Select ☆ next to a city's name to save it.</p>
         <button type="button" id="notify-button" class="link-button" hidden></button>
       </section>
-    </header>
+    </div>
+  </header>
 
-    <p id="status" class="status" role="status"></p>
+  <div class="band">
+    <div class="container">
+      <p id="status" class="status" role="status"></p>
 
-    <section id="alerts" class="panel alerts" aria-labelledby="alerts-title" hidden>
-      <h2 id="alerts-title" class="panel-title">Severe weather alerts</h2>
+      <section class="welcome" aria-labelledby="welcome-title">
+        <h2 id="welcome-title">Search for a city</h2>
+        <p>Current conditions, the next 24 hours, and the 7-day forecast.</p>
+      </section>
+
+      <section id="current-weather" class="hero" aria-labelledby="hero-place" hidden>
+        <div class="hero-main">
+          <div class="hero-place">
+            <h2 id="hero-place" data-field="place"></h2>
+            <button type="button" data-field="favorite" class="favorite-toggle" aria-pressed="false">☆</button>
+          </div>
+          <p class="hero-meta"><span data-field="region"></span> <span data-field="asOf" class="hero-asof"></span></p>
+          <div class="hero-now">
+            <p class="hero-temp"><span data-field="temp"></span><span data-field="unit" class="visually-hidden"></span></p>
+            <span data-field="icon" class="hero-icon"></span>
+          </div>
+          <p class="hero-summary">
+            <span data-field="desc" class="hero-desc"></span>
+            <span class="hero-range">H <span data-field="high"></span> · L <span data-field="low"></span></span>
+          </p>
+        </div>
+
+        <dl class="hero-stats">
+          <div class="stat">
+            <dt>Feels like</dt>
+            <dd data-field="feels"></dd>
+          </div>
+          <div class="stat">
+            <dt>Humidity</dt>
+            <dd data-field="humidity"></dd>
+          </div>
+          <div class="stat">
+            <dt>Wind</dt>
+            <dd class="wind">
+              <span data-field="windArrow" class="wind-arrow" role="img" hidden>↑</span>
+              <span data-field="wind"></span>
+            </dd>
+          </div>
+        </dl>
+      </section>
+    </div>
+  </div>
+
+  <main class="container content">
+    <section id="alerts" class="card alerts" aria-labelledby="alerts-title" hidden>
+      <h2 id="alerts-title" class="card-title">Severe weather alerts</h2>
       <ul data-field="list" class="alert-list"></ul>
     </section>
 
-    <section class="welcome" aria-labelledby="welcome-title">
-      <svg viewBox="0 0 64 64" class="welcome-icon" aria-hidden="true" focusable="false"><g stroke="#ffc83d" stroke-width="3.5" stroke-linecap="round"><line x1="37" y1="22" x2="42" y2="22"/><line x1="33.2" y1="31.2" x2="36.7" y2="34.7"/><line x1="24" y1="35" x2="24" y2="40"/><line x1="14.8" y1="31.2" x2="11.3" y2="34.7"/><line x1="11" y1="22" x2="6" y2="22"/><line x1="14.8" y1="12.8" x2="11.3" y2="9.3"/><line x1="24" y1="9" x2="24" y2="4"/><line x1="33.2" y1="12.8" x2="36.7" y2="9.3"/></g><circle cx="24" cy="22" r="9" fill="#ffc83d"/><path transform="translate(6 4) scale(0.95)" fill="#f2f6fb" d="M18 48h28a10 10 0 0 0 1.5-19.9A14 14 0 0 0 20.6 25.3 11.5 11.5 0 0 0 18 48z"/></svg>
-      <h2 id="welcome-title">Weather for anywhere</h2>
-      <p>Search for a city to see what it's like right now, the next 24 hours, and the week ahead.</p>
-    </section>
+    <div class="layout">
+      <div class="main-col">
+        <section id="hourly" class="card" aria-labelledby="hourly-title" hidden>
+          <h2 id="hourly-title" class="card-title">Hourly forecast</h2>
+          <ol data-field="list" class="hourly-list"></ol>
+        </section>
 
-    <section id="current-weather" class="hero" aria-labelledby="hero-place" hidden>
-      <div class="hero-main">
-        <div class="hero-place">
-          <h2 id="hero-place" data-field="place"></h2>
-          <button type="button" data-field="favorite" class="favorite-toggle" aria-pressed="false">☆</button>
-        </div>
-        <p data-field="region" class="hero-region"></p>
-        <div class="hero-now">
-          <span data-field="icon" class="hero-icon"></span>
-          <p class="hero-temp"><span data-field="temp"></span><span data-field="unit" class="visually-hidden"></span></p>
-        </div>
-        <p data-field="desc" class="hero-desc"></p>
-        <p class="hero-range">
-          <span>H <span data-field="high"></span></span>
-          <span>L <span data-field="low"></span></span>
-        </p>
+        <section id="weekly" class="card" aria-labelledby="weekly-title" hidden>
+          <h2 id="weekly-title" class="card-title">7-day forecast</h2>
+          <ol data-field="list" class="day-list"></ol>
+        </section>
+
+        <section id="history" class="card" aria-labelledby="history-title" hidden>
+          <h2 id="history-title" class="card-title">Daily highs: last week vs. this week</h2>
+          <p data-field="trend" class="card-lead"></p>
+          <div class="chart-wrap">
+            <div data-field="chart"></div>
+            <div data-field="tooltip" class="chart-tooltip" hidden></div>
+          </div>
+          <details>
+            <summary>Show as table</summary>
+            <table class="data-table">
+              <thead><tr><th scope="col">Day</th><th scope="col">High</th></tr></thead>
+              <tbody data-field="table"></tbody>
+            </table>
+          </details>
+        </section>
       </div>
 
-      <dl class="hero-stats">
-        <div class="stat glass">
-          <dt>Feels like</dt>
-          <dd data-field="feels"></dd>
-        </div>
-        <div class="stat glass">
-          <dt>Humidity</dt>
-          <dd data-field="humidity"></dd>
-        </div>
-        <div class="stat stat-wind glass">
-          <dt>Wind</dt>
-          <dd class="wind">
-            <span data-field="windArrow" class="wind-arrow" role="img" hidden>↑</span>
-            <span data-field="wind"></span>
-          </dd>
-        </div>
-      </dl>
-    </section>
+      <aside class="side-col" aria-label="More details">
+        <section id="sun" class="card" aria-labelledby="sun-title" hidden>
+          <h2 id="sun-title" class="card-title">Sunrise and sunset</h2>
+          <div data-field="arc" class="sun-arc"></div>
+          <div class="sun-times">
+            <p><span class="label">Sunrise</span><span data-field="sunrise"></span></p>
+            <p><span class="label">Sunset</span><span data-field="sunset"></span></p>
+          </div>
+          <p data-field="daylight" class="card-foot"></p>
+        </section>
 
-    <div class="panels">
-      <section id="hourly" class="panel" aria-labelledby="hourly-title" hidden>
-        <h2 id="hourly-title" class="panel-title">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
-          Next 24 hours
-        </h2>
-        <ol data-field="list" class="hourly-list"></ol>
-      </section>
+        <section id="rain-chance" class="card" aria-labelledby="rain-title" hidden>
+          <h2 id="rain-title" class="card-title">Chance of rain</h2>
+          <label class="field">
+            <span>Date</span>
+            <input type="date" data-field="date">
+          </label>
+          <p data-field="result" class="rain-result" aria-live="polite"></p>
+        </section>
 
-      <section id="weekly" class="panel" aria-labelledby="weekly-title" hidden>
-        <h2 id="weekly-title" class="panel-title">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5.5" width="16" height="14" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>
-          7-day forecast
-        </h2>
-        <ol data-field="list" class="day-list"></ol>
-      </section>
-
-      <section id="history" class="panel" aria-labelledby="history-title" hidden>
-        <h2 id="history-title" class="panel-title">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19h16M5 15l4-5 4 3 6-7"/></svg>
-          Daily highs: last week vs. this week
-        </h2>
-        <p data-field="trend" class="panel-lead"></p>
-        <div class="chart-wrap">
-          <div data-field="chart"></div>
-          <div data-field="tooltip" class="chart-tooltip" hidden></div>
-        </div>
-        <details>
-          <summary>Show as table</summary>
-          <table class="data-table">
-            <thead><tr><th scope="col">Day</th><th scope="col">High</th></tr></thead>
-            <tbody data-field="table"></tbody>
-          </table>
-        </details>
-      </section>
-
-      <section id="sun" class="panel" aria-labelledby="sun-title" hidden>
-        <h2 id="sun-title" class="panel-title">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18h18M7 18a5 5 0 0 1 10 0M12 4v4M5.6 9.6l1.8 1.8M18.4 9.6l-1.8 1.8"/></svg>
-          Sunrise and sunset
-        </h2>
-        <div data-field="arc" class="sun-arc"></div>
-        <div class="sun-times">
-          <p><span class="label">Sunrise</span><span data-field="sunrise"></span></p>
-          <p><span class="label">Sunset</span><span data-field="sunset"></span></p>
-        </div>
-        <p data-field="daylight" class="panel-foot"></p>
-      </section>
-
-      <section id="rain-chance" class="panel" aria-labelledby="rain-title" hidden>
-        <h2 id="rain-title" class="panel-title">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5c3 4 6 7.3 6 10.8a6 6 0 0 1-12 0c0-3.5 3-6.8 6-10.8z"/></svg>
-          Chance of rain
-        </h2>
-        <label class="field">
-          <span>Date</span>
-          <input type="date" data-field="date">
-        </label>
-        <p data-field="result" class="rain-result" aria-live="polite"></p>
-      </section>
-
-      <section id="pollen" class="panel" aria-labelledby="pollen-title" hidden>
-        <h2 id="pollen-title" class="panel-title">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="2.5"/><circle cx="12" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="12" r="3"/></svg>
-          Pollen
-        </h2>
-        <p data-field="summary" class="pollen-summary"></p>
-        <dl data-field="levels" class="pollen-levels"></dl>
-      </section>
+        <section id="pollen" class="card" aria-labelledby="pollen-title" hidden>
+          <h2 id="pollen-title" class="card-title">Pollen</h2>
+          <p data-field="summary" class="pollen-summary"></p>
+          <dl data-field="levels" class="pollen-levels"></dl>
+        </section>
+      </aside>
     </div>
+  </main>
 
-    <footer class="credit">Weather data from <a href="https://open-meteo.com/">Open-Meteo</a> and the US National Weather Service.</footer>
-  </div>
+  <footer class="container credit">
+    Weather data: <a href="https://open-meteo.com/">Open-Meteo</a> and the US National Weather Service.
+  </footer>
 </body>
 </html>

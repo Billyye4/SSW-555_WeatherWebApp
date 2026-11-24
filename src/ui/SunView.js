@@ -32,9 +32,7 @@ export class SunView {
 
   // '2026-11-23T16:32' → '4:32 PM'. Reads the string directly, so it stays in the location's time zone.
   static formatClock(isoDateTime) {
-    const [hours, minutes] = isoDateTime.slice(11, 16).split(':').map(Number);
-    const suffix = hours < 12 ? 'AM' : 'PM';
-    return `${hours % 12 || 12}:${String(minutes).padStart(2, '0')} ${suffix}`;
+    return Dates.formatTime(isoDateTime);
   }
 
   // 137 → '2 h 17 min'
