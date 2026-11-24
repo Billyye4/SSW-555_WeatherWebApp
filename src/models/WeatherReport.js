@@ -41,4 +41,29 @@ export class WeatherReport {
     if (date < min || date > max) return null;
     return this.daily.find((d) => d.date === date)?.precipChanceMax ?? null;
   }
+
+  // US-03/US-10: the 7 days starting today.
+  week() {
+    const today = this.today();
+    return this.daily.filter((d) => d.date >= today).slice(0, 7);
+  }
+
+  // US-10: the 7 days before today.
+  history() {
+    const today = this.today();
+    return this.daily.filter((d) => d.date < today).slice(-7);
+  }
+
+  // US-10: average daily high this week (today + 6 days) vs. the previous 7 days, in °C.
+  // Returns null when either side has no data.
+  trendVsLastWeek() {
+    const avgHigh = (days) => {
+      const highs = days.map((d) => d.highC).filter((v) => v != null);
+      return highs.length ? highs.reduce((a, b) => a + b, 0) / highs.length : null;
+    };
+    const avgHighThisWeekC = avgHigh(this.week());
+    const avgHighLastWeekC = avgHigh(this.history());
+    if (avgHighThisWeekC == null || avgHighLastWeekC == null) return null;
+    return { avgHighThisWeekC, avgHighLastWeekC, differenceC: avgHighThisWeekC - avgHighLastWeekC };
+  }
 }

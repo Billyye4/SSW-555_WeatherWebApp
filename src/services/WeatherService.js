@@ -16,6 +16,9 @@ export const DAILY_FIELDS = [
 // Open-Meteo's maximum. US-09 lets users pick any date in this window.
 export const FORECAST_DAYS = 16;
 
+// Days of history before today, for US-10.
+export const PAST_DAYS = 7;
+
 // Fetches one WeatherReport per location with a single request.
 export class WeatherService {
   #http;
@@ -30,6 +33,7 @@ export class WeatherService {
       `longitude=${location.longitude}`,
       'timezone=auto',
       `forecast_days=${FORECAST_DAYS}`,
+      `past_days=${PAST_DAYS}`,
       `current=${CURRENT_FIELDS.join(',')}`,
       `hourly=${HOURLY_FIELDS.join(',')}`,
       `daily=${DAILY_FIELDS.join(',')}`,
