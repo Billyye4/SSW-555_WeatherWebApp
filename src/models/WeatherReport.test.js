@@ -141,3 +141,22 @@ test('nextHours returns fewer hours near the end of the forecast (US-02)', () =>
   const hours = withTwoDaysOfHours('2026-11-24T20:00').nextHours(24);
   assert.deepEqual(hours.map((h) => h.time), ['2026-11-24T20:00', '2026-11-24T21:00', '2026-11-24T22:00', '2026-11-24T23:00']);
 });
+
+test('week gives each day a high, low, and weather code for the 7-day forecast (US-03)', () => {
+  const codes = [0, 1, 2, 3, 45, 61, 95];
+  const r = report({
+    today: '2026-11-23',
+    daily: {
+      weather_code: (date, offset) => codes[offset] ?? 0,
+      temperature_2m_max: (date, offset) => 10 + offset,
+      temperature_2m_min: (date, offset) => 1 + offset,
+    },
+  });
+  const week = r.week();
+  assert.equal(week.length, 7);
+  assert.deepEqual(
+    { date: week[0].date, weatherCode: week[0].weatherCode, highC: week[0].highC, lowC: week[0].lowC },
+    { date: '2026-11-23', weatherCode: 0, highC: 10, lowC: 1 },
+  );
+  assert.deepEqual(week.map((d) => d.weatherCode), codes);
+});

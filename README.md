@@ -4,6 +4,7 @@ SSW 555 Scrum group project: a weather forecast web app.
 
 - Choose Fahrenheit or Celsius for the displayed temperatures.
 - Search for a city to see current conditions and hourly temperature and weather for the next 24 hours.
+- Search for a city to see current conditions and a seven-day forecast.
 - Plain HTML, CSS, and JavaScript modules. No framework, no build step.
 - Weather data from [Open-Meteo](https://open-meteo.com/). It's free and needs no API key.
 - Backlog and sprint plan are in [docs/BACKLOG.md](docs/BACKLOG.md).

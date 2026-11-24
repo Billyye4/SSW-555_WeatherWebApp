@@ -207,3 +207,38 @@ summary { cursor: pointer; color: #2563eb; }
 .hourly-icon { font-size: 1.5rem; }
 .hourly-description { color: #5b6878; font-size: 0.75rem; }
 .hourly-temperature { font-size: 1.1rem; font-weight: 600; }
+
+/* US-03 seven-day forecast */
+.forecast-section { margin-top: 1.5rem; }
+.forecast-section h2 { font-size: 1.1rem; }
+
+.forecast {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.forecast-day {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.75rem 0.35rem;
+  background: #fff;
+  color: #1b2430; /* Stays dark on night themes, where the page text turns light (US-13). */
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
+  text-align: center;
+}
+
+.forecast-icon { font-size: 1.5rem; }
+.forecast-description { color: #5b6878; font-size: 0.8rem; }
+.forecast-temperatures { font-size: 0.85rem; font-weight: 600; }
+
+@media (max-width: 40rem) {
+  .forecast {
+    grid-template-columns: repeat(7, minmax(5rem, 1fr));
+    overflow-x: auto;
+  }
+}
