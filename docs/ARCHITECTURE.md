@@ -167,6 +167,7 @@ These are all prefixed `weather:`.
 |-----|-------|
 | `weather:unit` | `"C"` or `"F"` |
 | `weather:favorites` | JSON array of `Location` objects |
+| `weather:seenAlerts` | JSON array of the last 200 alert ids already notified (US-07) |
 
 ### Git
 - Branch per story, named `US-<id>-<short-name>`, for example `US-07-alerts`. Open the PR title with the story id.
@@ -224,7 +225,9 @@ Everything from one forecast request: current conditions, 7 past days, today, an
 | `topAllergen()` | Name of the pollen type with the highest value | US-11 |
 
 #### `Alert`
-Fields: `title`, `severity` (`'Extreme' | 'Severe' | 'Moderate' | 'Minor'`, the same scale NWS uses), `description`, `starts`, `ends`, `source` (`'NWS' | 'forecast'`).
+Fields: `id` (the NWS alert id, or `forecast:<locationId>:<rule>:<date>` for rule alerts), `title`, `severity` (`'Extreme' | 'Severe' | 'Moderate' | 'Minor'`, the same scale NWS uses; anything else becomes `'Minor'`), `headline` (one line for the banner), `description`, `starts`, `ends`, `source` (`'NWS' | 'forecast'`).
+
+`static compare(a, b)` sorts the most severe first.
 
 ### 5.2 Services (`src/services/`)
 
@@ -291,7 +294,7 @@ This is the fallback outside the US. It flags dangerous conditions in the next 3
 
 | Method | Description |
 |--------|-------------|
-| `evaluate(report)` → `Alert[]` | Applies the thresholds below. The values live in a `THRESHOLDS` constant so the team can tune them. |
+| `evaluate(report)` → `Alert[]` | Applies the thresholds below and returns at most one alert per rule, for the first day it applies. The values (including `daysAhead: 3`) live in an exported `THRESHOLDS` constant so the team can tune them. |
 
 | Rule | Condition (any of the next 3 days) | Severity |
 |------|-----------------------------------|----------|
@@ -407,7 +410,16 @@ Views get callbacks (`onSearch`, `onChange`, …) from `App`, and never call ser
 | `HistoryView` | `#history` | `report.history()`, `report.trendVsLastWeek()`, `unit` | — | US-10 |
 | `SunView` | `#sun` | `report.sunTimesOn()`, `report.daylightRemainingMinutes()` | — | US-12 |
 | `PollenView` | `#pollen` | `PollenReport \| null` | — | US-11 |
-| `AlertBanner` | `#alerts` | Alerts for the current location plus a map of favorites' alerts | `onSelectLocation(id)` | US-07 |
+| `AlertBanner` | `#alerts` | `[{ location, alerts, isCurrent }]`: the current location first, then each saved one | `onSelectLocation(location)` | US-07 |
+
+#### `AlertNotifier` (`src/ui/AlertNotifier.js`, US-07)
+Browser notifications for new alerts on saved locations. They only work while the app is open in a tab, since there's no backend to push them.
+
+| Method | Description |
+|--------|-------------|
+| `constructor(store, NotificationApi = globalThis.Notification)` | Takes a `LocalStore` |
+| `attach(buttonEl)` | Wires the `#notify-button`. Permission is only requested when it's clicked, and the button text shows the current permission state. |
+| `notify(entries, { silent })` | `entries` is `[{ location, alerts }]`. Shows one notification per alert id not seen before and saves seen ids in `weather:seenAlerts`. With `silent: true` it only marks them as seen; `App` does this on page load and when a favorite is added, because the banner already shows those alerts. |
 | `FavoritesView` | `#favorites` | `Location[]`, current id | `onSelect(location)`, `onRemove(id)` | US-06 |
 
 ## 6. Class diagram
@@ -504,7 +516,13 @@ classDiagram
     +themeFor(code, isDay)$ string
     +apply(conditions)
   }
+  class AlertNotifier {
+    +attach(buttonEl)
+    +notify(entries, options) string[]
+  }
 
+  App --> AlertNotifier
+  AlertNotifier --> LocalStore
   App --> GeocodingService
   App --> LocationService
   App --> WeatherService
