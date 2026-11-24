@@ -29,6 +29,13 @@ export class WeatherReport {
     return this.current.time.slice(0, 10);
   }
 
+  // US-02: the next n hours, starting with the current hour.
+  nextHours(n = 24) {
+    const thisHour = `${this.current.time.slice(0, 13)}:00`;
+    const start = this.hourly.findIndex((h) => h.time >= thisHour);
+    return start === -1 ? [] : this.hourly.slice(start, start + n);
+  }
+
   // US-09: the dates a user can ask about, today through the last forecast day.
   forecastRange() {
     const last = this.daily.at(-1);
