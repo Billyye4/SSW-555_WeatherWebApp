@@ -4,6 +4,8 @@ import { HttpClient } from './services/HttpClient.js';
 import { GeocodingService } from './services/GeocodingService.js';
 import { WeatherService } from './services/WeatherService.js';
 import { AirQualityService } from './services/AirQualityService.js';
+import { LocationService } from './services/LocationService.js';
+import { Location } from './models/Location.js';
 import { LocalStore } from './storage/LocalStore.js';
 import { PreferencesStore } from './storage/PreferencesStore.js';
 import { FavoritesStore } from './storage/FavoritesStore.js';
@@ -28,6 +30,12 @@ import { AlertNotifier } from './ui/AlertNotifier.js';
 
 const $ = (selector) => document.querySelector(selector);
 
+// US-04: shown when the browser can't or won't share the user's location.
+const DEFAULT_LOCATION = new Location({
+  name: 'Hoboken', region: 'New Jersey', country: 'United States', countryCode: 'US',
+  latitude: 40.744, longitude: -74.0324,
+});
+
 const http = new HttpClient();
 const store = new LocalStore();
 const weather = new WeatherService(http);
@@ -41,6 +49,7 @@ const views = {
     onSearch: (name) => app.search(name),
     onSuggest: (query) => app.suggest(query),
     onSelect: (location) => app.loadLocation(location),
+    onUseMyLocation: () => app.useMyLocation(),
   }),
   matches: new OtherMatchesView($('#other-matches'), { onSelect: (location) => app.loadLocation(location) }),
   unitToggle: new UnitToggle($('#unit-toggle'), { onChange: (unit) => app.setUnit(unit) }),
@@ -69,5 +78,7 @@ app = new App({
   notifier,
   airQuality: new AirQualityService(http),
   theme: new Theme(),
+  locator: new LocationService(),
+  defaultLocation: DEFAULT_LOCATION,
 });
 app.init();
