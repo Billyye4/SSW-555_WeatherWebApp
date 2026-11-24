@@ -1,29 +1,40 @@
 // Owns the app state, calls services, and tells views to render.
 export class App {
+  static ALERT_POLL_MS = 15 * 60 * 1000;
+
   #views;
   #statusEl;
   #geocoding;
   #weather;
   #prefs;
   #favorites;
+  #alerts;
+  #notifier;
 
   #unit = 'F';
   #location = null;
   #report = null;
+  #currentAlerts = [];
+  #favoriteAlerts = new Map();
   #loadId = 0;
 
-  constructor({ views, statusEl, geocoding, weather, prefs, favorites }) {
+  constructor({ views, statusEl, geocoding, weather, prefs, favorites, alerts, notifier }) {
     this.#views = views;
     this.#statusEl = statusEl;
     this.#geocoding = geocoding;
     this.#weather = weather;
     this.#prefs = prefs;
     this.#favorites = favorites;
+    this.#alerts = alerts;
+    this.#notifier = notifier;
   }
 
   init() {
     this.#unit = this.#prefs.getUnit();
     this.#renderFavorites();
+    // On load the banner already shows current alerts, so don't also pop notifications for them.
+    this.refreshFavoriteAlerts({ silent: true });
+    setInterval(() => this.refreshFavoriteAlerts(), App.ALERT_POLL_MS);
   }
 
   async search(name) {
@@ -46,12 +57,21 @@ export class App {
       if (loadId !== this.#loadId) return;
       this.#location = location;
       this.#report = report;
+      this.#currentAlerts = [];
       this.#render();
       this.#renderFavorites();
+      this.#renderAlerts();
       this.#setStatus('');
     } catch (err) {
       if (loadId === this.#loadId) this.#setStatus(err.message);
+      return;
     }
+
+    // Alerts load after the weather so they never hold it up.
+    const alerts = await this.#alerts.getAlerts(location, this.#report).catch(() => []);
+    if (loadId !== this.#loadId) return;
+    this.#currentAlerts = alerts;
+    this.#renderAlerts();
   }
 
   // US-06: save or unsave the location on screen.
@@ -62,13 +82,26 @@ export class App {
     else this.#favorites.add(this.#location);
     this.#render();
     this.#renderFavorites();
+    // The new favorite's alerts are already on screen, so don't also notify about them.
+    this.refreshFavoriteAlerts({ silent: true });
   }
 
   // US-06: remove from the favorites list.
   removeFavorite(id) {
     this.#favorites.remove(id);
+    this.#favoriteAlerts.delete(id);
     this.#render();
     this.#renderFavorites();
+    this.#renderAlerts();
+  }
+
+  // US-07: check every saved location, show the results, and notify about new ones.
+  async refreshFavoriteAlerts({ silent = false } = {}) {
+    const favorites = this.#favorites.list();
+    this.#favoriteAlerts = await this.#alerts.checkFavorites(favorites);
+    this.#renderAlerts();
+    const entries = favorites.map((location) => ({ location, alerts: this.#favoriteAlerts.get(location.id) ?? [] }));
+    this.#notifier.notify(entries, { silent });
   }
 
   #render() {
@@ -85,6 +118,18 @@ export class App {
 
   #renderFavorites() {
     this.#views.favorites.render(this.#favorites.list(), this.#location?.id ?? null);
+  }
+
+  // The location on screen first, then each saved location (without repeating the current one).
+  #renderAlerts() {
+    const currentId = this.#location?.id ?? null;
+    const entries = [];
+    if (this.#location) entries.push({ location: this.#location, alerts: this.#currentAlerts, isCurrent: true });
+    for (const location of this.#favorites.list()) {
+      if (location.id === currentId) continue;
+      entries.push({ location, alerts: this.#favoriteAlerts.get(location.id) ?? [], isCurrent: false });
+    }
+    this.#views.alerts.render(entries);
   }
 
   #setStatus(message) {

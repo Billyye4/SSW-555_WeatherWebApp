@@ -11,6 +11,7 @@ export const HOURLY_FIELDS = ['temperature_2m', 'precipitation_probability', 'we
 export const DAILY_FIELDS = [
   'temperature_2m_max', 'temperature_2m_min', 'weather_code', 'sunrise', 'sunset',
   'precipitation_probability_max',
+  'wind_gusts_10m_max',
 ];
 
 // Open-Meteo's maximum. US-09 lets users pick any date in this window.

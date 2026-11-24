@@ -11,11 +11,19 @@ import { CurrentWeatherView } from './ui/CurrentWeatherView.js';
 import { RainChanceView } from './ui/RainChanceView.js';
 import { HistoryView } from './ui/HistoryView.js';
 import { FavoritesView } from './ui/FavoritesView.js';
+import { AlertService } from './services/AlertService.js';
+import { NwsAlertProvider } from './services/NwsAlertProvider.js';
+import { RuleAlertProvider } from './services/RuleAlertProvider.js';
+import { AlertBanner } from './ui/AlertBanner.js';
+import { AlertNotifier } from './ui/AlertNotifier.js';
 
 const $ = (selector) => document.querySelector(selector);
 
 const http = new HttpClient();
 const store = new LocalStore();
+const weather = new WeatherService(http);
+const notifier = new AlertNotifier(store);
+notifier.attach($('#notify-button'));
 
 // Views call back into the app, which is created right after them.
 let app;
@@ -28,14 +36,17 @@ const views = {
     onSelect: (location) => app.loadLocation(location),
     onRemove: (id) => app.removeFavorite(id),
   }),
+  alerts: new AlertBanner($('#alerts'), { onSelectLocation: (location) => app.loadLocation(location) }),
 };
 
 app = new App({
   views,
   statusEl: $('#status'),
   geocoding: new GeocodingService(http),
-  weather: new WeatherService(http),
+  weather,
   prefs: new PreferencesStore(store),
   favorites: new FavoritesStore(store),
+  alerts: new AlertService(new NwsAlertProvider(http), new RuleAlertProvider(), weather),
+  notifier,
 });
 app.init();
