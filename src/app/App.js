@@ -10,15 +10,17 @@ export class App {
   #favorites;
   #alerts;
   #notifier;
+  #airQuality;
 
   #unit = 'F';
   #location = null;
   #report = null;
   #currentAlerts = [];
   #favoriteAlerts = new Map();
+  #pollen; // PollenReport, null where there's no data, or undefined while it loads
   #loadId = 0;
 
-  constructor({ views, statusEl, geocoding, weather, prefs, favorites, alerts, notifier }) {
+  constructor({ views, statusEl, geocoding, weather, prefs, favorites, alerts, notifier, airQuality }) {
     this.#views = views;
     this.#statusEl = statusEl;
     this.#geocoding = geocoding;
@@ -27,6 +29,7 @@ export class App {
     this.#favorites = favorites;
     this.#alerts = alerts;
     this.#notifier = notifier;
+    this.#airQuality = airQuality;
   }
 
   init() {
@@ -58,6 +61,7 @@ export class App {
       this.#location = location;
       this.#report = report;
       this.#currentAlerts = [];
+      this.#pollen = undefined;
       this.#render();
       this.#renderFavorites();
       this.#renderAlerts();
@@ -67,11 +71,17 @@ export class App {
       return;
     }
 
-    // Alerts load after the weather so they never hold it up.
-    const alerts = await this.#alerts.getAlerts(location, this.#report).catch(() => []);
+    // Alerts and pollen (US-11) load after the weather so they never hold it up.
+    // If pollen fails, its card says the data isn't available.
+    const [alerts, pollen] = await Promise.all([
+      this.#alerts.getAlerts(location, this.#report).catch(() => []),
+      this.#airQuality.getPollen(location).catch(() => null),
+    ]);
     if (loadId !== this.#loadId) return;
     this.#currentAlerts = alerts;
+    this.#pollen = pollen;
     this.#renderAlerts();
+    this.#views.pollen.render(pollen);
   }
 
   // US-06: save or unsave the location on screen.
@@ -118,6 +128,7 @@ export class App {
       sun: report.sunTimesOn(),
       daylightMinutes: report.daylightRemainingMinutes(),
     });
+    this.#views.pollen.render(this.#pollen);
   }
 
   #renderFavorites() {

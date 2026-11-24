@@ -3,6 +3,7 @@ import { App } from './app/App.js';
 import { HttpClient } from './services/HttpClient.js';
 import { GeocodingService } from './services/GeocodingService.js';
 import { WeatherService } from './services/WeatherService.js';
+import { AirQualityService } from './services/AirQualityService.js';
 import { LocalStore } from './storage/LocalStore.js';
 import { PreferencesStore } from './storage/PreferencesStore.js';
 import { FavoritesStore } from './storage/FavoritesStore.js';
@@ -11,6 +12,7 @@ import { CurrentWeatherView } from './ui/CurrentWeatherView.js';
 import { RainChanceView } from './ui/RainChanceView.js';
 import { HistoryView } from './ui/HistoryView.js';
 import { SunView } from './ui/SunView.js';
+import { PollenView } from './ui/PollenView.js';
 import { FavoritesView } from './ui/FavoritesView.js';
 import { AlertService } from './services/AlertService.js';
 import { NwsAlertProvider } from './services/NwsAlertProvider.js';
@@ -34,6 +36,7 @@ const views = {
   rainChance: new RainChanceView($('#rain-chance')),
   history: new HistoryView($('#history')),
   sun: new SunView($('#sun')),
+  pollen: new PollenView($('#pollen')),
   favorites: new FavoritesView($('#favorites'), {
     onSelect: (location) => app.loadLocation(location),
     onRemove: (id) => app.removeFavorite(id),
@@ -50,5 +53,6 @@ app = new App({
   favorites: new FavoritesStore(store),
   alerts: new AlertService(new NwsAlertProvider(http), new RuleAlertProvider(), weather),
   notifier,
+  airQuality: new AirQualityService(http),
 });
 app.init();
