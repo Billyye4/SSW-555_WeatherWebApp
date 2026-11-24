@@ -27,6 +27,7 @@ import { AlertNotifier } from './ui/AlertNotifier.js';
 const $ = (selector) => document.querySelector(selector);
 
 const http = new HttpClient();
+const theme = new Theme();
 const store = new LocalStore();
 const weather = new WeatherService(http);
 const notifier = new AlertNotifier(store);
@@ -61,6 +62,16 @@ app = new App({
   alerts: new AlertService(new NwsAlertProvider(http), new RuleAlertProvider(), weather),
   notifier,
   airQuality: new AirQualityService(http),
-  theme: new Theme(),
+  theme,
 });
 app.init();
+
+// US-13: animated clouds, rain, and snow in the weather band. It loads after the forecast so it never delays it.
+// It's skipped for people who prefer reduced motion, and on devices without WebGL2 (which Three.js needs),
+// so those never download the library. The plain gradient stays in both cases.
+const reduceMotion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? true;
+if (!reduceMotion && document.createElement('canvas').getContext('webgl2')) {
+  import('./ui/WeatherScene.js')
+    .then(({ WeatherScene }) => theme.attachScene(new WeatherScene($('.band'))))
+    .catch(() => {});
+}

@@ -2,8 +2,9 @@ import { Units } from '../util/Units.js';
 import { Dates } from '../util/Dates.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-const W = 340;
 const H = 190;
+// The chart is drawn at its real width, so its text stays the same size on every screen.
+const MIN_W = 280;
 const PAD = { top: 30, right: 14, bottom: 26, left: 34 };
 
 // Last week's daily highs next to this week's forecast, plus a one-line trend (US-10).
@@ -13,6 +14,7 @@ export class HistoryView {
   #chart;
   #tooltip;
   #table;
+  #drawn = null; // { days, todayIndex, unit, width } of the last chart, to redraw when the panel resizes
 
   constructor(rootEl) {
     this.#root = rootEl;
@@ -20,6 +22,12 @@ export class HistoryView {
     this.#chart = rootEl.querySelector('[data-field="chart"]');
     this.#tooltip = rootEl.querySelector('[data-field="tooltip"]');
     this.#table = rootEl.querySelector('[data-field="table"]');
+    if (globalThis.ResizeObserver) {
+      new ResizeObserver(() => {
+        const d = this.#drawn;
+        if (d && this.#chartWidth() !== d.width) this.#drawChart(d.days, d.todayIndex, d.unit);
+      }).observe(this.#chart);
+    }
   }
 
   render({ history, week, trend }, unit) {
@@ -53,7 +61,13 @@ export class HistoryView {
     return ticks;
   }
 
+  #chartWidth() {
+    return Math.max(MIN_W, Math.round(this.#chart.clientWidth || MIN_W));
+  }
+
   #drawChart(days, todayIndex, unit) {
+    const W = this.#chartWidth();
+    this.#drawn = { days, todayIndex, unit, width: W };
     const temps = days.map((d) => (d.highC == null ? null : Units.temp(d.highC, unit)));
     const known = temps.filter((t) => t != null);
     const ticks = HistoryView.niceTicks(Math.min(...known), Math.max(...known));

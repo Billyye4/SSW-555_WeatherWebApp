@@ -44,6 +44,7 @@ One class per file, with its tests next to it. The full tree and conventions are
 | `src/util/` | Pure helpers: units, dates, weather codes |
 | `src/ui/` | Views that render into the page |
 | `src/testing/` | Test helpers (fake API responses, fake storage) |
+| `vendor/three/` | [three.js](https://threejs.org/) r187, unmodified, for the animated weather band (MIT license) |
 
 ## Team workflow
 

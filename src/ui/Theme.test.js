@@ -25,3 +25,18 @@ test('apply sets data-theme on the root element', () => {
   new Theme(root).apply({ weatherCode: 71, isDay: true });
   assert.equal(root.dataset.theme, 'snow-day');
 });
+
+test('an attached scene gets the conditions already showing, then every update', () => {
+  const seen = [];
+  const theme = new Theme({ dataset: {} });
+  theme.apply({ weatherCode: 63, isDay: true });
+  theme.attachScene({ update: (c) => seen.push(c.weatherCode) });
+  theme.apply({ weatherCode: 71, isDay: false });
+  assert.deepEqual(seen, [63, 71]);
+});
+
+test('attaching a scene before any weather loads sends nothing yet', () => {
+  const seen = [];
+  new Theme({ dataset: {} }).attachScene({ update: (c) => seen.push(c) });
+  assert.deepEqual(seen, []);
+});

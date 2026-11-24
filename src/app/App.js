@@ -129,17 +129,22 @@ export class App {
     if (!this.#report) return;
     const report = this.#report;
     const isFavorite = this.#favorites.has(this.#location.id);
-    this.#views.current.render({ location: this.#location, current: report.current, isFavorite }, this.#unit);
-    this.#views.hourly.render(report.nextHours(24), this.#unit);
-    this.#views.weekly.render(report.week(), this.#unit);
+    const week = report.week();
+    this.#views.current.render(
+      { location: this.#location, current: report.current, today: week[0], isFavorite },
+      this.#unit,
+    );
+    this.#views.hourly.render(report.nextHours(24), this.#unit, { isDay: (time) => report.isDaytime(time) });
+    this.#views.weekly.render(week, this.#unit, { currentC: report.current.temperatureC });
     this.#views.rainChance.render(report);
     this.#views.history.render(
-      { history: report.history(), week: report.week(), trend: report.trendVsLastWeek() },
+      { history: report.history(), week, trend: report.trendVsLastWeek() },
       this.#unit,
     );
     this.#views.sun.render({
       sun: report.sunTimesOn(),
       daylightMinutes: report.daylightRemainingMinutes(),
+      now: report.current.time,
     });
     this.#views.pollen.render(this.#pollen);
     this.#theme.apply(report.current);
