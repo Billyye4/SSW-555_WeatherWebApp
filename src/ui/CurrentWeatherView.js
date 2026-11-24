@@ -22,7 +22,18 @@ export class CurrentWeatherView {
     f.desc.textContent = label;
     f.feels.textContent = Units.formatTemp(current.feelsLikeC, unit);
     f.humidity.textContent = `${current.humidity}%`;
-    f.wind.textContent = Units.formatSpeed(current.windKmh, unit);
+    this.#renderWind(current, unit);
     this.#root.hidden = false;
+  }
+
+  // US-08: speed, compass direction, and an arrow pointing where the wind blows toward.
+  #renderWind({ windKmh, windDirectionDeg }, unit) {
+    const { wind, windArrow } = this.#fields;
+    wind.textContent = Units.formatWind(windKmh, windDirectionDeg, unit);
+    windArrow.hidden = windDirectionDeg == null;
+    if (windDirectionDeg == null) return;
+    // Meteorological direction is where the wind comes FROM, so the arrow is turned 180°.
+    windArrow.style.transform = `rotate(${windDirectionDeg + 180}deg)`;
+    windArrow.setAttribute('aria-label', `Wind from ${Units.degreesToCompass(windDirectionDeg)}`);
   }
 }

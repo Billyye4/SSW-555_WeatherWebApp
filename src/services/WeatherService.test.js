@@ -13,6 +13,7 @@ test('reportUrl asks for current, hourly, and daily data in the location time zo
   assert.equal(url.searchParams.get('longitude'), '-74.03');
   assert.equal(url.searchParams.get('timezone'), 'auto');
   assert.match(url.searchParams.get('current'), /temperature_2m/);
+  assert.match(url.searchParams.get('current'), /wind_speed_10m,wind_direction_10m/); // US-08
   assert.match(url.searchParams.get('hourly'), /precipitation_probability/);
   assert.match(url.searchParams.get('daily'), /temperature_2m_max/);
 });

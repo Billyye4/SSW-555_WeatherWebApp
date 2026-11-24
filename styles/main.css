@@ -54,3 +54,14 @@ dl {
 
 dt { color: #5b6878; }
 dd { margin: 0; }
+
+.wind { display: flex; align-items: center; gap: 0.4rem; }
+
+.wind-arrow {
+  display: inline-block;
+  font-weight: 700;
+  color: #2563eb;
+  transition: transform 0.4s ease;
+}
+
+[hidden] { display: none !important; }
