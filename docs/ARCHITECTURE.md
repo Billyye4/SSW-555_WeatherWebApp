@@ -98,6 +98,8 @@ SSW-555_WeatherWebApp/
         ├── Theme.js
         ├── Theme.test.js       Tests the pure themeFor() only
         ├── SearchBar.js
+        ├── OtherMatchesView.js
+        ├── StatusView.js
         ├── UnitToggle.js
         ├── CurrentWeatherView.js
         ├── HourlyView.js
@@ -153,7 +155,7 @@ The foundation PR (branch `US-00-src-foundation`) moved the original flat files 
 
 ### Errors
 - Services throw `Error` with a **message a user can read**, such as "No city found for "Atlantis"." or "Network error. Check your connection and try again."
-- `App` catches errors and shows `err.message` in the `#status` element. Views never catch errors themselves.
+- `App` catches errors and shows `err.message` through `StatusView`: a red `role="alert"` box (`#search-error`) that screen readers announce. Loading text goes in the polite `#status` region. Views never catch errors themselves.
 
 ### CSS and HTML
 - Each view's root element has an id in kebab-case that matches the class: `CurrentWeatherView` → `#current-weather`.
@@ -243,7 +245,8 @@ Fields: `id` (the NWS alert id, or `forecast:<locationId>:<rule>:<date>` for rul
 | Method | Description |
 |--------|-------------|
 | `constructor(http)` | |
-| `search(name)` → `Location` | `geocoding-api.open-meteo.com/v1/search?count=1&language=en&name=…`. Throws `No city found for "<name>".` |
+| `searchMany(name, count = 5)` → `Location[]` | `geocoding-api.open-meteo.com/v1/search?count=…&language=en&name=…`, best match first. Skips results without valid coordinates and lists places with the same id once. Understands `"City, State, Country"`: it searches the city name (Open-Meteo matches names only) and moves results whose state, country, or country code match the rest to the front. Throws `Type a city name to search.` for an empty name and `No city found for "<name>".` when nothing matches. |
+| `search(name)` → `Location` | The best match only (`searchMany(name, 1)`). |
 
 #### `LocationService` (US-04)
 
@@ -370,7 +373,8 @@ Helpers for Open-Meteo's `YYYY-MM-DD` strings. The math is done in UTC, so the v
 |--------|-------------|
 | `constructor({ views, geocoding, location, weather, airQuality, alerts, prefs, favorites })` | Every dependency is passed in from `main.js` |
 | `init()` | Reads the saved unit, renders favorites, and tries `location.getCurrentPosition()` (US-04). If that fails, it shows a prompt to search. It also starts favorite-alert polling. |
-| `search(name)` | Calls `geocoding.search(name)`, then `loadLocation()` (US-05) |
+| `search(name)` | Calls `geocoding.searchMany(name)`, loads the best match, and keeps the rest for `OtherMatchesView` (US-05). Disables the search button while loading. |
+| `suggest(query)` → `Location[]` | Suggestions while typing; returns `[]` on any failure (US-05) |
 | `loadLocation(location)` | Shows "Loading…", then fetches the report, pollen, and alerts with `Promise.all`, renders every view, and applies the theme |
 | `setUnit(unit)` | Saves the unit and re-renders from the cached report without re-fetching (US-01) |
 | `toggleFavorite()` | Adds or removes the current location, then re-renders `FavoritesView` (US-06) |
@@ -401,7 +405,9 @@ Views get callbacks (`onSearch`, `onChange`, …) from `App`, and never call ser
 
 | View | Root id | `render(...)` input | Callbacks | Story |
 |------|---------|---------------------|-----------|-------|
-| `SearchBar` | `#search` | — | `onSearch(name)`, `onUseMyLocation()` | US-05, US-04 |
+| `SearchBar` | `#search` | — (has `setBusy(busy)`) | `onSearch(name)`, `onSuggest(query)` → `Promise<Location[]>`, `onSelect(location)`, `onUseMyLocation()` | US-05, US-04 |
+| `OtherMatchesView` | `#other-matches` | All matches from the last search, current id | `onSelect(location)` | US-05 |
+| `StatusView` | `#status`, `#search-error` | `loading(message)`, `error(message)`, `clear()` | — | US-05 |
 | `UnitToggle` | `#unit-toggle` | `unit` | `onChange(unit)` | US-01 |
 | `CurrentWeatherView` | `#current-weather` | `report.current`, `location`, `isFavorite`, `unit` | `onToggleFavorite()` | US-01, US-08 |
 | `HourlyView` | `#hourly` | `report.nextHours(24)`, `unit` | — | US-02 |
@@ -441,6 +447,7 @@ classDiagram
     +getJSON(url, headers) object
   }
   class GeocodingService {
+    +searchMany(name, count) Location[]
     +search(name) Location
   }
   class LocationService {
@@ -570,8 +577,8 @@ sequenceDiagram
 
   User->>SB: types "Hoboken", presses Search
   SB->>App: onSearch("Hoboken")
-  App->>Geo: search("Hoboken")
-  Geo-->>App: Location
+  App->>Geo: searchMany("Hoboken")
+  Geo-->>App: Location[] (best match first)
   App->>WS: getReport(location)
   WS-->>App: WeatherReport
   par in parallel
@@ -595,7 +602,7 @@ sequenceDiagram
 | US-02 | Hourly forecast | `WeatherReport.nextHours()`, `HourlyView` | `hourly.*` |
 | US-03 | Weekly forecast | `WeatherReport.week()`, `WeeklyView` | `daily.temperature_2m_max/min`, `weather_code` |
 | US-04 | Weather where I am | `LocationService`, `App.init()`, `SearchBar` | Browser Geolocation API |
-| US-05 | Search a city | `GeocodingService`, `Location`, `SearchBar` | Open-Meteo geocoding |
+| US-05 | Search a city | `GeocodingService`, `Location`, `SearchBar`, `OtherMatchesView`, `StatusView` | Open-Meteo geocoding |
 | US-06 | Saved favorites | `FavoritesStore`, `LocalStore`, `FavoritesView`, `App.toggleFavorite()` | `localStorage` |
 | US-07 | Severe alerts for saved locations | `AlertService`, `NwsAlertProvider`, `RuleAlertProvider`, `Alert`, `AlertBanner`, `App.refreshFavoriteAlerts()` | NWS `alerts/active`; `daily.weather_code`, `wind_gusts_10m_max`, `temperature_2m_max/min` |
 | US-08 | Wind speed and direction | `CurrentConditions`, `Units.formatWind()`, `Units.degreesToCompass()`, `CurrentWeatherView` | `current.wind_speed_10m`, `wind_direction_10m` |
