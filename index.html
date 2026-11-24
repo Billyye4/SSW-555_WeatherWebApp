@@ -4,8 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Weather</title>
-  <link rel="stylesheet" href="style.css">
-  <script type="module" src="app.js"></script>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/themes.css">
+  <script type="module" src="src/main.js"></script>
 </head>
 <body>
   <main>
@@ -18,23 +19,88 @@
 
     <p id="status" role="status"></p>
 
-    <section id="current" hidden>
-      <h2 id="place"></h2>
-      <div class="now">
-        <span id="icon" class="icon" aria-hidden="true"></span>
-        <span id="temp" class="temp"></span>
+    <fieldset id="unit-toggle">
+      <legend>Temperature unit</legend>
+      <label><input type="radio" name="unit" value="F" checked> Fahrenheit</label>
+      <label><input type="radio" name="unit" value="C"> Celsius</label>
+    </fieldset>
+
+    <section id="favorites" aria-labelledby="favorites-title">
+      <h2 id="favorites-title" class="section-title">Favorites</h2>
+      <ul data-field="list" class="favorite-list"></ul>
+      <p data-field="empty" class="hint">Press ☆ on a city to save it here.</p>
+      <button type="button" id="notify-button" class="link-button" hidden></button>
+    </section>
+
+    <section id="alerts" class="card alerts" aria-labelledby="alerts-title" hidden>
+      <h2 id="alerts-title">Severe weather alerts</h2>
+      <ul data-field="list" class="alert-list"></ul>
+    </section>
+
+    <section id="current-weather" class="card" hidden>
+      <div class="card-header">
+        <h2 data-field="place"></h2>
+        <button type="button" data-field="favorite" class="favorite-toggle" aria-pressed="false">☆</button>
       </div>
-      <p id="desc"></p>
+      <div class="now">
+        <span data-field="icon" class="icon" aria-hidden="true"></span>
+        <span data-field="temp" class="temp"></span>
+      </div>
+      <p data-field="desc"></p>
       <dl>
-        <dt>Feels like</dt><dd id="feels"></dd>
-        <dt>Humidity</dt><dd id="humidity"></dd>
-        <dt>Wind</dt><dd id="wind"></dd>
+        <dt>Feels like</dt><dd data-field="feels"></dd>
+        <dt>Humidity</dt><dd data-field="humidity"></dd>
+        <dt>Wind</dt>
+        <dd class="wind">
+          <span data-field="wind"></span>
+          <span data-field="windArrow" class="wind-arrow" role="img" hidden>↑</span>
+        </dd>
       </dl>
     </section>
 
-    <section id="forecast" class="forecast-section" aria-labelledby="forecast-heading" hidden>
-      <h2 id="forecast-heading">7-day forecast</h2>
-      <div class="forecast"></div>
+    <section id="hourly" aria-labelledby="hourly-heading" hidden>
+      <h2 id="hourly-heading">Next 24 hours</h2>
+      <div data-field="list" class="hourly-list"></div>
+    </section>
+
+    <section id="rain-chance" class="card" hidden>
+      <h2>Chance of rain</h2>
+      <label class="field">
+        <span>Date</span>
+        <input type="date" data-field="date">
+      </label>
+      <p data-field="result" aria-live="polite"></p>
+    </section>
+
+    <section id="history" class="card" hidden>
+      <h2>Daily highs: last week vs. this week</h2>
+      <p data-field="trend"></p>
+      <div class="chart-wrap">
+        <div data-field="chart"></div>
+        <div data-field="tooltip" class="chart-tooltip" hidden></div>
+      </div>
+      <details>
+        <summary>Show as table</summary>
+        <table class="data-table">
+          <thead><tr><th scope="col">Day</th><th scope="col">High</th></tr></thead>
+          <tbody data-field="table"></tbody>
+        </table>
+      </details>
+    </section>
+
+    <section id="sun" class="card" hidden>
+      <h2>Sunrise and sunset</h2>
+      <dl>
+        <dt>Sunrise</dt><dd data-field="sunrise"></dd>
+        <dt>Sunset</dt><dd data-field="sunset"></dd>
+        <dt>Daylight left</dt><dd data-field="daylight"></dd>
+      </dl>
+    </section>
+
+    <section id="pollen" class="card" hidden>
+      <h2>Pollen</h2>
+      <p data-field="summary" class="pollen-summary"></p>
+      <dl data-field="levels"></dl>
     </section>
   </main>
 </body>
