@@ -1,33 +1,44 @@
-// Loading text and error alerts under the search bar (US-05).
-// Loading goes in a polite live region; errors go in a role="alert" box so screen readers
-// announce them right away.
+// Loading text and alerts under the search bar (US-05, US-04).
+// Loading goes in a polite live region; errors and notices go in a role="alert" box so
+// screen readers announce them right away.
 export class StatusView {
   #statusEl;
-  #errorEl;
+  #alertEl;
 
-  constructor(statusEl, errorEl) {
+  constructor(statusEl, alertEl) {
     this.#statusEl = statusEl;
-    this.#errorEl = errorEl;
+    this.#alertEl = alertEl;
   }
 
   loading(message = 'Loading…') {
     this.#statusEl.textContent = message;
-    this.#hideError();
+    this.#hideAlert();
   }
 
+  // Something failed (red).
   error(message) {
-    this.#statusEl.textContent = '';
-    this.#errorEl.textContent = `⚠ ${message}`;
-    this.#errorEl.hidden = false;
+    this.#showAlert(`⚠ ${message}`, 'error');
+  }
+
+  // Something the user should know that isn't a failure, such as a fallback location (blue).
+  notice(message) {
+    this.#showAlert(`ℹ ${message}`, 'notice');
   }
 
   clear() {
     this.#statusEl.textContent = '';
-    this.#hideError();
+    this.#hideAlert();
   }
 
-  #hideError() {
-    this.#errorEl.hidden = true;
-    this.#errorEl.textContent = '';
+  #showAlert(text, kind) {
+    this.#statusEl.textContent = '';
+    this.#alertEl.textContent = text;
+    this.#alertEl.dataset.kind = kind;
+    this.#alertEl.hidden = false;
+  }
+
+  #hideAlert() {
+    this.#alertEl.hidden = true;
+    this.#alertEl.textContent = '';
   }
 }

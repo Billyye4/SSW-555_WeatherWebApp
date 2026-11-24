@@ -12,6 +12,8 @@ export class App {
   #notifier;
   #airQuality;
   #theme;
+  #locator;
+  #defaultLocation;
 
   #unit = 'F';
   #location = null;
@@ -22,7 +24,10 @@ export class App {
   #matches = []; // US-05: every place the last search matched
   #loadId = 0;
 
-  constructor({ views, status, geocoding, weather, prefs, favorites, alerts, notifier, airQuality, theme }) {
+  constructor({
+    views, status, geocoding, weather, prefs, favorites, alerts, notifier, airQuality, theme,
+    locator, defaultLocation,
+  }) {
     this.#views = views;
     this.#status = status;
     this.#geocoding = geocoding;
@@ -33,6 +38,8 @@ export class App {
     this.#notifier = notifier;
     this.#airQuality = airQuality;
     this.#theme = theme;
+    this.#locator = locator;
+    this.#defaultLocation = defaultLocation;
   }
 
   init() {
@@ -42,6 +49,44 @@ export class App {
     // On load the banner already shows current alerts, so don't also pop notifications for them.
     this.refreshFavoriteAlerts({ silent: true });
     setInterval(() => this.refreshFavoriteAlerts(), App.ALERT_POLL_MS);
+    this.#loadStartLocation();
+  }
+
+  // US-04: show weather without a search. A location detected on an earlier visit loads
+  // straight away without asking again (#11); otherwise ask the browser (#9), and fall back to
+  // the default location with a notice if that fails (#10).
+  async #loadStartLocation() {
+    const saved = this.#prefs.getLastLocation();
+    if (saved) await this.loadLocation(saved);
+    else await this.useMyLocation({ fallbackToDefault: true });
+  }
+
+  // US-04: the "Use my location" button, and the first visit.
+  async useMyLocation({ fallbackToDefault = false } = {}) {
+    const loadId = ++this.#loadId;
+    this.#views.search.setBusy(true);
+    this.#status.loading('Finding your location…');
+    let here;
+    try {
+      here = await this.#locator.getCurrentPosition();
+    } catch (err) {
+      // The user searched for something else while we waited, so stay out of the way.
+      if (loadId !== this.#loadId) return;
+      if (!fallbackToDefault) {
+        this.#status.error(`${err.message} Search for a city instead.`);
+        this.#views.search.setBusy(false);
+        return;
+      }
+      const fallback = this.#defaultLocation;
+      if (await this.loadLocation(fallback)) {
+        this.#status.notice(`${err.message} Showing ${fallback.name} instead. Search for a city, `
+          + 'or press "Use my location" to try again.');
+      }
+      return;
+    }
+    if (loadId !== this.#loadId) return;
+    this.#prefs.setLastLocation(here);
+    await this.loadLocation(here);
   }
 
   // US-05: load the best match and keep the others so the user can switch to them.
@@ -70,6 +115,7 @@ export class App {
     }
   }
 
+  // Resolves to true once the weather is on screen, false if it failed or a newer load replaced it.
   async loadLocation(location) {
     // If the user starts another search while this one is loading, only the newest one renders.
     const loadId = ++this.#loadId;
@@ -79,7 +125,7 @@ export class App {
     this.#status.loading();
     try {
       const report = await this.#weather.getReport(location);
-      if (loadId !== this.#loadId) return;
+      if (loadId !== this.#loadId) return false;
       this.#location = location;
       this.#report = report;
       this.#currentAlerts = [];
@@ -91,7 +137,7 @@ export class App {
       this.#status.clear();
     } catch (err) {
       if (loadId === this.#loadId) this.#status.error(err.message);
-      return;
+      return false;
     } finally {
       if (loadId === this.#loadId) this.#views.search.setBusy(false);
     }
@@ -102,11 +148,13 @@ export class App {
       this.#alerts.getAlerts(location, this.#report).catch(() => []),
       this.#airQuality.getPollen(location).catch(() => null),
     ]);
-    if (loadId !== this.#loadId) return;
+    // The weather is on screen either way, so report success even if a newer load took over.
+    if (loadId !== this.#loadId) return true;
     this.#currentAlerts = alerts;
     this.#pollen = pollen;
     this.#renderAlerts();
     this.#views.pollen.render(pollen);
+    return true;
   }
 
   // US-01: switch between °F and °C. Re-renders from the cached report without fetching again.

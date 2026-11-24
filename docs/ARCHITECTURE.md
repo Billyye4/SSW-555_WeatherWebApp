@@ -170,6 +170,7 @@ These are all prefixed `weather:`.
 | `weather:unit` | `"C"` or `"F"` |
 | `weather:favorites` | JSON array of `Location` objects |
 | `weather:seenAlerts` | JSON array of the last 200 alert ids already notified (US-07) |
+| `weather:lastLocation` | The last location the browser detected, as a `Location` object (US-04) |
 
 ### Git
 - Branch per story, named `US-<id>-<short-name>`, for example `US-07-alerts`. Open the PR title with the story id.
@@ -253,7 +254,7 @@ Fields: `id` (the NWS alert id, or `forecast:<locationId>:<rule>:<date>` for rul
 | Method | Description |
 |--------|-------------|
 | `constructor(geolocation = globalThis.navigator?.geolocation)` | |
-| `getCurrentPosition()` → `Location` | Wraps `geolocation.getCurrentPosition` in a Promise. Returns `Location` named "Your location" with no country. A denied permission becomes "Location access was denied. Search for a city instead." |
+| `getCurrentPosition()` → `Location` | Wraps `geolocation.getCurrentPosition` in a Promise (10 s timeout; a position up to 10 minutes old is reused). Returns a `Location` named "Your location" with no country, since Open-Meteo has no reverse geocoding. Rejects with an `Error` whose `code` is `denied`, `unavailable`, `timeout`, or `unsupported`, and whose message a user can read, such as "Location access was denied." |
 
 #### `WeatherService` (US-01, 02, 03, 08, 09, 10, 12)
 
@@ -317,13 +318,15 @@ This is the fallback outside the US. It flags dangerous conditions in the next 3
 | `get(key, fallback)` | Parses JSON, and returns `fallback` when the value is missing or corrupt |
 | `set(key, value)` | Stores the value as JSON |
 
-#### `PreferencesStore` (US-01)
+#### `PreferencesStore` (US-01, US-04)
 
 | Method | Description |
 |--------|-------------|
 | `constructor(store)` | Takes a `LocalStore` |
 | `getUnit()` → `Unit` | Default `'F'` |
 | `setUnit(unit)` | Throws if the unit isn't `'C'` or `'F'` |
+| `getLastLocation()` → `Location \| null` | The last detected location; `null` if none is saved or it's invalid (US-04) |
+| `setLastLocation(location)` | Saves a detected location (US-04) |
 
 #### `FavoritesStore` (US-06)
 
@@ -371,8 +374,9 @@ Helpers for Open-Meteo's `YYYY-MM-DD` strings. The math is done in UTC, so the v
 
 | Method | Description |
 |--------|-------------|
-| `constructor({ views, geocoding, location, weather, airQuality, alerts, prefs, favorites })` | Every dependency is passed in from `main.js` |
-| `init()` | Reads the saved unit, renders favorites, and tries `location.getCurrentPosition()` (US-04). If that fails, it shows a prompt to search. It also starts favorite-alert polling. |
+| `constructor({ views, status, geocoding, weather, prefs, favorites, alerts, notifier, airQuality, theme, locator, defaultLocation })` | Every dependency is passed in from `main.js`. `locator` is a `LocationService`; `defaultLocation` is the fallback place (Hoboken, NJ), defined in `main.js`. |
+| `init()` | Reads the saved unit, renders favorites, and starts favorite-alert polling. Then shows weather without a search (US-04): a location detected on an earlier visit loads straight away without asking again; otherwise it calls `useMyLocation({ fallbackToDefault: true })`. |
+| `useMyLocation({ fallbackToDefault })` | US-04, also the 📍 button. Asks `locator.getCurrentPosition()`, saves the result with `prefs.setLastLocation()`, and loads it. If that fails: with `fallbackToDefault`, it loads `defaultLocation` and shows a blue notice explaining why; without it, it shows a red error and keeps the current place. If the user searches while it waits, the search wins. |
 | `search(name)` | Calls `geocoding.searchMany(name)`, loads the best match, and keeps the rest for `OtherMatchesView` (US-05). Disables the search button while loading. |
 | `suggest(query)` → `Location[]` | Suggestions while typing; returns `[]` on any failure (US-05) |
 | `loadLocation(location)` | Shows "Loading…", then fetches the report, pollen, and alerts with `Promise.all`, renders every view, and applies the theme |
@@ -437,7 +441,9 @@ classDiagram
   class App {
     +init()
     +search(name)
-    +loadLocation(location)
+    +suggest(query) Location[]
+    +useMyLocation(options)
+    +loadLocation(location) boolean
     +setUnit(unit)
     +toggleFavorite()
     +refreshFavoriteAlerts()

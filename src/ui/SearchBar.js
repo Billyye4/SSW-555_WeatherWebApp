@@ -1,4 +1,4 @@
-// City search with suggestions as you type (US-05).
+// City search with suggestions as you type (US-05) and a "Use my location" button (US-04).
 // Follows the ARIA combobox pattern: arrow keys move through the list, Enter picks,
 // Escape closes. Views don't call services, so suggestions come from the onSuggest callback.
 export class SearchBar {
@@ -8,24 +8,31 @@ export class SearchBar {
   #form;
   #input;
   #button;
+  #locate;
   #list;
   #callbacks;
   #options = [];
   #active = -1;
   #timer = null;
 
-  // callbacks: onSearch(name), onSuggest(query) -> Promise<Location[]>, onSelect(location)
+  // callbacks: onSearch(name), onSuggest(query) -> Promise<Location[]>, onSelect(location),
+  // onUseMyLocation()
   constructor(rootEl, callbacks) {
     this.#form = rootEl;
     this.#input = rootEl.elements.city;
     this.#button = rootEl.querySelector('button[type="submit"]');
     this.#list = rootEl.querySelector('[role="listbox"]');
+    this.#locate = rootEl.querySelector('[data-action="locate"]');
     this.#callbacks = callbacks;
 
     rootEl.addEventListener('submit', (e) => {
       e.preventDefault();
       this.#close();
       callbacks.onSearch(this.#input.value);
+    });
+    this.#locate?.addEventListener('click', () => {
+      this.#close();
+      callbacks.onUseMyLocation?.();
     });
     this.#input.addEventListener('input', () => this.#scheduleSuggest());
     this.#input.addEventListener('keydown', (e) => this.#onKeyDown(e));
@@ -39,9 +46,10 @@ export class SearchBar {
     });
   }
 
-  // Disables the button while a search loads.
+  // Disables the buttons while a search or location lookup loads.
   setBusy(busy) {
     this.#button.disabled = busy;
+    if (this.#locate) this.#locate.disabled = busy;
     this.#form.setAttribute('aria-busy', String(busy));
   }
 
