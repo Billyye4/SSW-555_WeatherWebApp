@@ -16,6 +16,8 @@ test('reportUrl asks for current, hourly, and daily data in the location time zo
   assert.match(url.searchParams.get('current'), /wind_speed_10m,wind_direction_10m/); // US-08
   assert.match(url.searchParams.get('hourly'), /precipitation_probability/);
   assert.match(url.searchParams.get('daily'), /temperature_2m_max/);
+  assert.match(url.searchParams.get('daily'), /precipitation_probability_max/); // US-09
+  assert.equal(url.searchParams.get('forecast_days'), '16'); // US-09
 });
 
 test('getReport makes one request and returns a WeatherReport', async () => {

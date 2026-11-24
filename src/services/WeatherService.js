@@ -10,7 +10,11 @@ export const CURRENT_FIELDS = [
 export const HOURLY_FIELDS = ['temperature_2m', 'precipitation_probability', 'weather_code'];
 export const DAILY_FIELDS = [
   'temperature_2m_max', 'temperature_2m_min', 'weather_code', 'sunrise', 'sunset',
+  'precipitation_probability_max',
 ];
+
+// Open-Meteo's maximum. US-09 lets users pick any date in this window.
+export const FORECAST_DAYS = 16;
 
 // Fetches one WeatherReport per location with a single request.
 export class WeatherService {
@@ -25,6 +29,7 @@ export class WeatherService {
       `latitude=${location.latitude}`,
       `longitude=${location.longitude}`,
       'timezone=auto',
+      `forecast_days=${FORECAST_DAYS}`,
       `current=${CURRENT_FIELDS.join(',')}`,
       `hourly=${HOURLY_FIELDS.join(',')}`,
       `daily=${DAILY_FIELDS.join(',')}`,

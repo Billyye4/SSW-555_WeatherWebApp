@@ -7,6 +7,7 @@ import { LocalStore } from './storage/LocalStore.js';
 import { PreferencesStore } from './storage/PreferencesStore.js';
 import { SearchBar } from './ui/SearchBar.js';
 import { CurrentWeatherView } from './ui/CurrentWeatherView.js';
+import { RainChanceView } from './ui/RainChanceView.js';
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -18,6 +19,7 @@ let app;
 const views = {
   search: new SearchBar($('#search'), { onSearch: (name) => app.search(name) }),
   current: new CurrentWeatherView($('#current-weather')),
+  rainChance: new RainChanceView($('#rain-chance')),
 };
 
 app = new App({

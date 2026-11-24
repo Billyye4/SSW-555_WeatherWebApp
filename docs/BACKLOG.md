@@ -13,7 +13,7 @@ For where each story's code goes, see [ARCHITECTURE.md](ARCHITECTURE.md).
 | US-06 | As a returning user, I want to have my favorite locations saved so that I can check the weather quickly. | 2 | 3 | To do |
 | US-07 | As a commuter, I want to receive severe weather alerts for my saved locations so that I can stay safe during extreme conditions. | 5 | 3 | To do |
 | US-08 | As a user, I want to see the wind speed and direction so I can decide whether I want to wear a long sleeve shirt and/or jacket. | 1 | 1 | Done |
-| US-09 | As a user, I want predicted chance of rain for a specific date so that I can decide whether to book an indoor backup. | 3 | 2 | To do |
+| US-09 | As a user, I want predicted chance of rain for a specific date so that I can decide whether to book an indoor backup. | 3 | 2 | Done |
 | US-10 | As a user, I want to see historical weather data for the previous week so that I can compare current trends to recent days. | 3 | 4 | To do |
 | US-11 | As someone with allergies, I want to see a pollen index so that I can plan my day ahead of time. | 2 | 4 | To do |
 | US-12 | As a user, I want to see local sunrise and sunset times so that I know how much daylight is left. | 1 | 2 | To do |
